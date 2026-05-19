@@ -12,7 +12,7 @@ return Application::configure(basePath: dirname(__DIR__))
         then: function () {
             require __DIR__.'/../routes/CoreSystem/core.routes.php';
             require __DIR__.'/../routes/AttendanceLeave/attendance.routes.php';
-            require __DIR__.'/../routes/EmployeeMangement/employee.routes.php';
+            require __DIR__.'/../routes/EmployeeManagement/employee.routes.php';
             require __DIR__.'/../routes/PayrollReport/payroll.routes.php';
         }
     )
