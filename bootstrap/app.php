@@ -10,10 +10,10 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
         then: function () {
-            require __DIR__.'/../routes/core_system/core.routes.php';
-            require __DIR__.'/../routes/attendance_leave/attendance.routes.php';
-            require __DIR__.'/../routes/employee_management/employee.routes.php';
-            require __DIR__.'/../routes/payroll_reports/payroll.routes.php';
+            require __DIR__.'/../routes/CoreSystem/core.routes.php';
+            require __DIR__.'/../routes/AttendanceLeave/attendance.routes.php';
+            require __DIR__.'/../routes/EmployeeMangement/employee.routes.php';
+            require __DIR__.'/../routes/PayrollReport/payroll.routes.php';
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {

@@ -3,6 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/payroll', function () {
-    return view('payroll_reports.payroll.index');
+    return view('Payrollreport.payroll.index');
 })->name('payroll.index');
 

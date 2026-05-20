@@ -3,5 +3,5 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/core', function () {
-    return view('core_system.dashboard.index');
+    return view('CoreSystem.dashboard.index');
 })->name('dashboard');

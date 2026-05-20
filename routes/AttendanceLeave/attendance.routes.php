@@ -3,6 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/attendance', function () {
-    return view('attendance_leave.attendance.index');
+    return view('AttendanceLeave.attendance.index');
 })->name('attendance.index');
 
