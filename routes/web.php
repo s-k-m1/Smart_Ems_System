@@ -6,3 +6,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::get('/employees/create',[EmployeeController::class,'create']);
+Route::post('/employees',[EmployeeController::class,'store']);
