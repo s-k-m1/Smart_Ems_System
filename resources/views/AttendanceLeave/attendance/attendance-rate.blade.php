@@ -1,10 +1,10 @@
-<div class="bg-white rounded-[32px] p-8 shadow-sm">
+<div class="bg-white rounded-[32px] p-8 shadow-lg border border-slate-100 h-full">
 
     {{-- Header --}}
-    <div class="flex justify-between items-center">
+    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-6">
 
         <div>
-            <h1 class="text-[34px] font-semibold text-slate-700">
+            <h1 class="text-[28px] lg:text-[34px] font-semibold text-slate-700">
                 Attendance Rate
             </h1>
 
@@ -13,7 +13,7 @@
             </div>
         </div>
 
-        <h1 class="text-[72px] font-bold text-slate-700">
+        <h1 class="text-[48px] lg:text-[60px] xl:text-[72px] font-bold text-slate-700 leading-none">
             {{ $rate }}%
         </h1>
 
@@ -26,7 +26,7 @@
     </p>
 
     {{-- Monthly Blocks --}}
-    <div class="flex items-end gap-6 overflow-x-auto pb-4">
+    <div class="flex items-end gap-4 overflow-x-auto pb-4">
 
         @php
             $colors = [
@@ -46,16 +46,7 @@
             @endphp
 
             <div
-                class="
-                    min-w-[130px]
-                    rounded-[24px]
-                    text-white
-                    p-5
-                    flex
-                    flex-col
-                    justify-between
-                    {{ $colors[$index % count($colors)] }}
-                "
+                class="min-w-[110px] rounded-[24px] text-white p-5 flex flex-col justify-between {{ $colors[$index % count($colors)] }}"
                 style="height: {{ $height }}px"
             >
 
@@ -63,7 +54,7 @@
                     {{ $month['month'] }}
                 </p>
 
-                <h2 class="text-3xl font-bold">
+                <h2 class="text-2xl font-bold">
                     {{ $month['percentage'] }}%
                 </h2>
 
@@ -74,7 +65,7 @@
     </div>
 
     {{-- Footer --}}
-    <div class="mt-10 text-gray-400 leading-7">
+    <div class="mt-8 text-gray-400 leading-7">
         Employee monthly attendance rate highlights consistent attendance performance.
     </div>
 
