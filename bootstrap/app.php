@@ -11,7 +11,7 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
         then: function () {
             require __DIR__.'/../routes/CoreSystem/core.routes.php';
-            require __DIR__.'/../routes/AttendanceLeave/attendance.routes.php';
+            require __DIR__.'/../routes/AttendanceLeave/attendance.php';
             require __DIR__.'/../routes/EmployeeManagement/employee.routes.php';
             require __DIR__.'/../routes/PayrollReport/payroll.routes.php';
         }
