@@ -1,78 +1,40 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-
 use Illuminate\Database\Schema\Blueprint;
-
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    public function up()
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
     {
+        Schema::table('attendances', function (Blueprint $table) {
 
-        Schema::create(
+            $table->decimal(
+                'working_hours',
+                5,
+                2
+            )
+            ->default(0)
+            ->after('check_out');
 
-            'attendances',
-
-            function (Blueprint $table) {
-
-                $table->id();
-
-                $table
-                ->foreignId(
-                    'employee_id'
-                )
-                ->constrained(
-                    'employees'
-                )
-                ->cascadeOnDelete();
-
-
-                $table
-                ->enum(
-                    'status',
-                    [
-                        'Present',
-                        'Late',
-                        'Undertime',
-                        'Absent'
-                    ]
-                );
-
-
-                $table
-                ->date(
-                    'date'
-                );
-
-
-                $table
-                ->time(
-                    'check_in'
-                )
-                ->nullable();
-
-
-
-                $table
-                ->time(
-                    'check_out'
-                )
-                ->nullable();
-
-
-                $table
-                ->timestamps();
-            }
-        );
+        });
     }
 
-
-    public function down()
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
     {
-        Schema::dropIfExists(
-            'attendances'
-        );
+        Schema::table('attendances', function (Blueprint $table) {
+
+            $table->dropColumn(
+                'working_hours'
+            );
+
+        });
     }
 };
