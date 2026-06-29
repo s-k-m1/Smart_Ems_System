@@ -8,8 +8,15 @@
 
 
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\Employeecontroller;
 use Illuminate\Support\Facades\Route;
 
-// Add this line into your existing routes/web.php
+// report page
 Route::get('/report', [ReportController::class, 'index'])->name('report.index');
+
+
+
+// employee detail page
+
+Route::get('/empdetail', [EmployeeController::class, 'index'])->name('empdetail.index');
 ?>
