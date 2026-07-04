@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Employee extends Model
 {
+    protected $table = 'employees';
+
     protected $fillable = [
         'employee_id',
         'name',
@@ -27,9 +29,17 @@ class Employee extends Model
         'joined' => 'date',
     ];
 
-    // Lets us do $employee->formatted_salary in Blade instead of formatting it everywhere.
     public function getFormattedSalaryAttribute()
     {
         return 'Rs. ' . number_format($this->salary);
+    }
+
+    public function attendances()
+    {
+        return $this->hasMany(
+            Attendance::class,
+            'employee_id',
+            'id'
+        );
     }
 }
