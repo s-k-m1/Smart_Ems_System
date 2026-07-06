@@ -127,20 +127,6 @@ class NotificationController extends Controller
         );
     }
 
-   
-    //   Edit Notification
-   
-    public function edit($id)
-    {
-        $notification = Notification::findOrFail($id);
-
-        return view(
-            'NotificationManagement.notifications.edit',
-            compact('notification')
-        );
-    }
-
-    
     //  Update Notification
     
     public function update(Request $request, $id)

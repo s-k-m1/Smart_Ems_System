@@ -1,0 +1,187 @@
+@php
+$categories = [
+    'All' => 'All Notices',
+    'Company' => 'Company',
+    'HR' => 'HR',
+    'Payroll' => 'Payroll',
+    'Policies' => 'Policies',
+    'Training' => 'Training',
+    'Events' => 'Events',
+];
+
+$currentCategory = request('category', 'All');
+@endphp
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-2">
+
+    <div class="flex items-center gap-3 overflow-x-auto whitespace-nowrap">
+
+        @foreach($categories as $key => $label)
+
+            @php
+
+                if($key == 'All'){
+                    $count = \App\Models\Notification::count();
+                }else{
+                    $count = \App\Models\Notification::where('category',$key)->count();
+                }
+
+                $active = $currentCategory == $key;
+
+            @endphp
+
+            <a href="{{ route('notifications.index',['category'=>$key]) }}"
+
+                class="group flex items-center gap-2 px-5 py-3 rounded-xl transition-all duration-200
+
+                {{ $active
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'bg-slate-50 hover:bg-blue-50 text-slate-700'
+                }}">
+
+                {{-- Category Icon --}}
+                @switch($key)
+
+                    @case('Company')
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M3 21h18M5 21V7l8-4 8 4v14"/>
+
+                        </svg>
+
+                    @break
+
+                    @case('HR')
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M17 20h5V4H2v16h5m10 0v-6H7v6m10 0H7"/>
+
+                        </svg>
+
+                    @break
+
+                    @case('Payroll')
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 8c-2 0-4 1-4 3s2 3 4 3 4 1 4 3-2 3-4 3m0-12V4m0 16v-2"/>
+
+                        </svg>
+
+                    @break
+
+                    @case('Policies')
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 12h6m-6 4h6M7 4h10l2 2v14H5V6l2-2z"/>
+
+                        </svg>
+
+                    @break
+
+                    @case('Training')
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422A12.083 12.083 0 0112 20.055a12.083 12.083 0 01-6.16-9.477L12 14z"/>
+
+                        </svg>
+
+                    @break
+
+                    @case('Events')
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10m2 10H5a2 2 0 01-2-2V7a2 2 0 012-2h14a2 2 0 012 2v12a2 2 0 01-2 2z"/>
+
+                        </svg>
+
+                    @break
+
+                    @default
+
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor">
+
+                            <path stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M9 17v-2a4 4 0 014-4h6"/>
+
+                        </svg>
+
+                @endswitch
+
+                <span class="font-medium">
+
+                    {{ $label }}
+
+                </span>
+
+                <span class="text-xs px-2 py-1 rounded-full
+
+                    {{ $active
+                        ? 'bg-white/20 text-white'
+                        : 'bg-blue-100 text-blue-700'
+                    }}">
+
+                    {{ $count }}
+
+                </span>
+
+            </a>
+
+        @endforeach
+
+    </div>
+
+</div>
