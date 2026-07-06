@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
 
@@ -20,129 +20,171 @@
 
 <body
     class="
+        min-h-screen
         bg-gradient-to-br
         from-slate-100
         via-blue-50
         to-indigo-100
-        min-h-screen
     "
 >
 
+<div
+    class="
+        max-w-7xl
+        mx-auto
+        px-4
+        sm:px-6
+        lg:px-8
+        py-6
+        lg:py-10
+    "
+>
+
+    {{-- Header --}}
     <div
         class="
-            max-w-7xl
-            mx-auto
-            p-10
+            flex
+            flex-col
+            lg:flex-row
+            justify-between
+            items-start
+            lg:items-center
+            gap-6
+            mb-8
         "
     >
 
-        {{-- Header --}}
-        <div
-            class="
-                mb-8
-                flex
-                justify-between
-                items-center
-            "
-        >
+        <div>
 
-            <div>
-
-                <h1
-                    class="
-                        text-5xl
-                        font-bold
-                        text-slate-800
-                    "
-                >
-                    Attendance Report
-                </h1>
-
-                <p
-                    class="
-                        text-gray-500
-                        mt-2
-                    "
-                >
-                    Track and manage employee attendance records
-                </p>
-
-            </div>
-
-            <a
-                href="/attendance/create"
+            <h1
                 class="
-                    px-8
-                    py-4
-                    rounded-2xl
-                    bg-gradient-to-r
-                    from-blue-500
-                    to-indigo-600
-                    text-white
-                    shadow-lg
-                    hover:scale-105
-                    transition
+                    text-3xl
+                    sm:text-4xl
+                    lg:text-5xl
+                    font-bold
+                    text-slate-800
                 "
             >
-                ＋ Add Attendance
-            </a>
+                Attendance Report
+            </h1>
+
+            <p
+                class="
+                    mt-2
+                    text-sm
+                    sm:text-base
+                    text-gray-500
+                "
+            >
+                Track and manage employee attendance records
+            </p>
 
         </div>
 
-        {{-- Card --}}
-        <div
+        <a
+            href="/attendance/create"
             class="
-                bg-white/90
-                backdrop-blur-lg
-                rounded-[36px]
-                shadow-2xl
-                overflow-hidden
+                w-full
+                sm:w-auto
+                text-center
+                px-6
+                py-3
+                rounded-xl
+                bg-gradient-to-r
+                from-blue-500
+                to-indigo-600
+                text-white
+                font-semibold
+                shadow-lg
+                hover:scale-105
+                transition
             "
         >
+            + Add Attendance
+        </a>
 
-            {{-- Table Header --}}
-            <div
-                class="
-                    bg-gradient-to-r
-                    from-blue-600
-                    to-indigo-600
-                    text-white
-                    px-10
-                    py-8
-                "
-            >
+    </div>
 
-                <div
+    {{-- Report Card --}}
+    <div
+        class="
+            bg-white
+            rounded-2xl
+            lg:rounded-[32px]
+            shadow-xl
+            overflow-hidden
+        "
+    >
+
+        <div class="overflow-x-auto">
+
+            <table class="min-w-full">
+
+                <thead
                     class="
-                        grid
-                        grid-cols-4
-                        font-semibold
-                        text-lg
+                        bg-gradient-to-r
+                        from-blue-600
+                        to-indigo-600
+                        text-white
                     "
                 >
 
-                    <div>Employee</div>
-                    <div>Status</div>
-                    <div>Date</div>
+                    <tr>
 
-                    <div class="text-center">
-                        Action
-                    </div>
+                        <th
+                            class="
+                                px-6
+                                py-5
+                                text-left
+                                whitespace-nowrap
+                            "
+                        >
+                            Employee
+                        </th>
 
-                </div>
+                        <th
+                            class="
+                                px-6
+                                py-5
+                                text-left
+                                whitespace-nowrap
+                            "
+                        >
+                            Status
+                        </th>
 
-            </div>
+                        <th
+                            class="
+                                px-6
+                                py-5
+                                text-left
+                                whitespace-nowrap
+                            "
+                        >
+                            Date
+                        </th>
 
-            {{-- Rows --}}
-            @foreach($attendances as $att)
+                        <th
+                            class="
+                                px-6
+                                py-5
+                                text-center
+                                whitespace-nowrap
+                            "
+                        >
+                            Actions
+                        </th>
 
-                <div
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                @foreach($attendances as $att)
+
+                <tr
                     class="
-                        grid
-                        grid-cols-4
-                        items-center
-                        px-10
-                        py-8
                         border-b
                         hover:bg-blue-50
                         transition
@@ -150,7 +192,7 @@
                 >
 
                     {{-- Employee --}}
-                    <div>
+                    <td class="px-6 py-5">
 
                         <div
                             class="
@@ -162,19 +204,20 @@
 
                             <div
                                 class="
-                                    w-14
-                                    h-14
+                                    w-12
+                                    h-12
                                     rounded-full
                                     bg-blue-100
                                     flex
                                     items-center
                                     justify-center
-                                    text-blue-600
                                     font-bold
-                                    text-lg
+                                    text-blue-600
                                 "
                             >
+
                                 {{ strtoupper(substr($att->employee->name,0,1)) }}
+
                             </div>
 
                             <div>
@@ -185,7 +228,9 @@
                                         text-slate-700
                                     "
                                 >
+
                                     {{ $att->employee->name }}
+
                                 </h2>
 
                                 <p
@@ -194,28 +239,33 @@
                                         text-sm
                                     "
                                 >
+
                                     Employee
+
                                 </p>
 
                             </div>
 
                         </div>
 
-                    </div>
-
-                    {{-- Status --}}
-                    <div>
+                    </td>
+                                    {{-- Status --}}
+                    <td class="px-6 py-5">
 
                         @if($att->status=='Present')
 
                             <span
                                 class="
-                                    px-5
+                                    inline-flex
+                                    items-center
+                                    px-4
                                     py-2
                                     rounded-full
                                     bg-green-100
                                     text-green-700
+                                    text-sm
                                     font-semibold
+                                    whitespace-nowrap
                                 "
                             >
                                 ✓ Present
@@ -225,12 +275,16 @@
 
                             <span
                                 class="
-                                    px-5
+                                    inline-flex
+                                    items-center
+                                    px-4
                                     py-2
                                     rounded-full
                                     bg-yellow-100
                                     text-yellow-700
+                                    text-sm
                                     font-semibold
+                                    whitespace-nowrap
                                 "
                             >
                                 🕒 Late
@@ -240,12 +294,16 @@
 
                             <span
                                 class="
-                                    px-5
+                                    inline-flex
+                                    items-center
+                                    px-4
                                     py-2
                                     rounded-full
                                     bg-orange-100
                                     text-orange-700
+                                    text-sm
                                     font-semibold
+                                    whitespace-nowrap
                                 "
                             >
                                 ⏱ Undertime
@@ -255,12 +313,16 @@
 
                             <span
                                 class="
-                                    px-5
+                                    inline-flex
+                                    items-center
+                                    px-4
                                     py-2
                                     rounded-full
                                     bg-red-100
                                     text-red-700
+                                    text-sm
                                     font-semibold
+                                    whitespace-nowrap
                                 "
                             >
                                 ✕ Absent
@@ -268,80 +330,108 @@
 
                         @endif
 
-                    </div>
+                    </td>
 
                     {{-- Date --}}
-                    <div
+                    <td
                         class="
+                            px-6
+                            py-5
+                            whitespace-nowrap
                             text-slate-600
                             font-medium
                         "
                     >
                         {{ $att->date }}
-                    </div>
+                    </td>
 
                     {{-- Actions --}}
-                    <div
-                        class="
-                            flex
-                            justify-center
-                            gap-4
-                        "
-                    >
+                    <td class="px-6 py-5">
 
-                        <a
-                            href="/attendance/{{ $att->id }}/edit"
+                        <div
                             class="
-                                px-6
-                                py-3
-                                rounded-2xl
-                                bg-yellow-100
-                                text-yellow-700
-                                hover:scale-105
-                                transition
+                                flex
+                                flex-col
+                                sm:flex-row
+                                justify-center
+                                gap-2
                             "
                         >
-                            ✏ Edit
-                        </a>
 
-                        <a
-                            href="/attendance/{{ $att->id }}/delete"
-                            class="
-                                px-6
-                                py-3
-                                rounded-2xl
-                                bg-red-100
-                                text-red-600
-                                hover:scale-105
-                                transition
-                            "
-                        >
-                            🗑 Delete
-                        </a>
+                            <a
+                                href="/attendance/{{ $att->id }}/edit"
+                                class="
+                                    text-center
+                                    px-4
+                                    py-2
+                                    rounded-xl
+                                    bg-yellow-100
+                                    text-yellow-700
+                                    hover:bg-yellow-200
+                                    transition
+                                "
+                            >
+                                ✏ Edit
+                            </a>
 
-                    </div>
+                            <a
+                                href="/attendance/{{ $att->id }}/delete"
+                                class="
+                                    text-center
+                                    px-4
+                                    py-2
+                                    rounded-xl
+                                    bg-red-100
+                                    text-red-600
+                                    hover:bg-red-200
+                                    transition
+                                "
+                            >
+                                🗑 Delete
+                            </a>
 
-                </div>
+                        </div>
 
-            @endforeach
+                    </td>
 
-            {{-- Pagination --}}
-            @if(method_exists($attendances,'links'))
+                </tr>
+
+                @endforeach
+
+                </tbody>
+
+            </table>
+
+        </div>
+                {{-- Pagination --}}
+        @if(method_exists($attendances,'links'))
+
+            <div
+                class="
+                    px-4
+                    sm:px-6
+                    lg:px-8
+                    py-5
+                    bg-gray-50
+                    border-t
+                "
+            >
 
                 <div
                     class="
-                        p-8
-                        bg-gray-50
+                        overflow-x-auto
                     "
                 >
                     {{ $attendances->links() }}
                 </div>
 
-            @endif
+            </div>
 
-        </div>
+        @endif
 
     </div>
+
+</div>
 
 </body>
 

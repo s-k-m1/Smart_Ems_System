@@ -319,24 +319,31 @@
 
                 </div>
 
-                {{-- Bottom Area --}}
+              {{-- Bottom Area --}}
                 <div
                     class="
-                        mt-10
+                        mt-8
                         bg-slate-50
-                        rounded-[28px]
-                        p-8
+                        rounded-2xl
+                        p-5
+                        sm:p-6
+                        lg:p-8
                         flex
+                        flex-col
+                        lg:flex-row
                         justify-between
-                        items-center
+                        items-start
+                        lg:items-center
+                        gap-6
                     "
                 >
 
-                    <div>
+                    <div class="w-full lg:w-auto">
 
                         <h3
                             class="
-                                text-xl
+                                text-lg
+                                sm:text-xl
                                 font-semibold
                                 text-slate-700
                             "
@@ -348,6 +355,8 @@
                             class="
                                 text-gray-400
                                 mt-2
+                                text-sm
+                                sm:text-base
                             "
                         >
                             Changes will immediately update attendance records.
@@ -355,14 +364,26 @@
 
                     </div>
 
-                    <div class="flex gap-5">
+                    <div
+                        class="
+                            flex
+                            flex-col
+                            sm:flex-row
+                            gap-3
+                            w-full
+                            lg:w-auto
+                        "
+                    >
 
                         <a
                             href="/attendance/report"
                             class="
-                                px-8
-                                py-4
-                                rounded-[20px]
+                                w-full
+                                sm:w-auto
+                                text-center
+                                px-6
+                                py-3
+                                rounded-xl
                                 bg-white
                                 shadow
                                 hover:shadow-lg
@@ -375,9 +396,12 @@
                         <button
                             type="submit"
                             class="
-                                px-10
-                                py-4
-                                rounded-[20px]
+                                w-full
+                                sm:w-auto
+                                whitespace-nowrap
+                                px-6
+                                py-3
+                                rounded-xl
                                 bg-gradient-to-r
                                 from-indigo-600
                                 to-blue-500
