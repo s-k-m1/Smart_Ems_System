@@ -1,8 +1,11 @@
 <div
     class="
-        bg-white
-        rounded-[34px]
-        p-10
+         bg-white
+        rounded-2xl
+        lg:rounded-[34px]
+        p-5
+        sm:p-6
+        lg:p-10
         shadow-sm
     "
 >
@@ -10,10 +13,13 @@
     {{-- Title --}}
     <h1
         class="
-            text-[34px]
+            text-2xl
+            sm:text-3xl
+            lg:text-[34px]
             font-semibold
             text-slate-700
-            mb-10
+            mb-6
+            lg:mb-10
         "
     >
         Employee Details
@@ -21,17 +27,23 @@
 
     <div
         class="
-            flex
-            items-center
-            gap-10
+        flex
+        flex-col
+        lg:flex-row
+        items-center
+        lg:items-start
+        gap-6
+        lg:gap-10
         "
     >
 
         {{-- Avatar --}}
         <div
             class="
-                w-28
-                h-28
+                w-24
+                h-24
+                sm:w-28
+                sm:h-28
                 rounded-full
                 overflow-hidden
                 bg-blue-50
@@ -55,9 +67,13 @@
 
             <h2
                 class="
-                    text-[42px]
+                    text-3xl
+                    sm:text-4xl
+                    lg:text-[42px]
                     font-semibold
                     text-slate-700
+                    text-center
+                    lg:text-left
                 "
             >
                 {{ $employee->name }}
@@ -78,11 +94,14 @@
         {{-- Details --}}
         <div
             class="
-                grid
-                grid-cols-4
-                gap-14
+               grid
+                grid-cols-1
+                sm:grid-cols-2
+                xl:grid-cols-4
+                gap-6
                 flex-1
-            "
+                w-full
+                            "
         >
 
             <div>
