@@ -17,4 +17,8 @@ class Payroll extends Model
         'payment_date',
         'status',
     ];
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
 }

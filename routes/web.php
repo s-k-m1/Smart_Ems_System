@@ -10,3 +10,4 @@ Route::get('/employees/create',[EmployeeController::class,'create']);
 Route::post('/employees',[EmployeeController::class,'store']);
 Route::get('/payroll/create',[PayrollController::class,'create']);
 Route::post('/payroll',[PayrollController::class,'store']);
+Route::get('/payroll',[PayrollController::class,'index']);

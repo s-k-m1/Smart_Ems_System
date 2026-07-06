@@ -1,8 +1,8 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PayrollController;
 
-Route::get('/payroll', function () {
-    return view('Payrollreport.payroll.index');
-})->name('payroll.index');
+Route::get('/payroll',[PayrollController::class, 'index'])
+->name('payroll.index');
 

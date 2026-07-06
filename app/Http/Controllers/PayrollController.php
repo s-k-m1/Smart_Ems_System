@@ -27,6 +27,11 @@ class PayrollController extends Controller
             'net_salary'=>$netSalary,
             'status'=>'Pending',
         ]);
-        return "Payroll Generated Successfully";
+        return redirect('/payroll');
+    }
+    public function index()
+    {
+        $payrolls = Payroll::with('employee')->latest()->get();
+        return view('PayrollReport.payroll.index',compact('payrolls'));
     }
 }
