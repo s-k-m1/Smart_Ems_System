@@ -9,17 +9,30 @@ class Employee extends Model
     protected $table = 'employees';
 
     protected $fillable = [
-
         'employee_id',
-
         'name',
-
-        'phone',
-
+        'department',
+        'position',
+        'status',
         'email',
-
-        'department'
+        'phone',
+        'joined',
+        'address',
+        'image',
+        'present_days',
+        'leave_taken',
+        'salary',
+        'projects',
     ];
+
+    protected $casts = [
+        'joined' => 'date',
+    ];
+
+    public function getFormattedSalaryAttribute()
+    {
+        return 'Rs. ' . number_format($this->salary);
+    }
 
     public function attendances()
     {
