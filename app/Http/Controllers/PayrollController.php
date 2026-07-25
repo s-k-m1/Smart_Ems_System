@@ -34,4 +34,11 @@ class PayrollController extends Controller
         $payrolls = Payroll::with('employee')->latest()->get();
         return view('PayrollReport.payroll.index',compact('payrolls'));
     }
+    public function markAsPaid($id)
+    {
+        $payroll = Payroll::findOrFail($id);
+        $payroll->status ="Paid";
+        $payroll->save();
+        return redirect('/payroll')->with('success', 'Payroll marked as Paid.');
+    }
 }

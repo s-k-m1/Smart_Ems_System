@@ -11,3 +11,4 @@ Route::post('/employees',[EmployeeController::class,'store']);
 Route::get('/payroll/create',[PayrollController::class,'create']);
 Route::post('/payroll',[PayrollController::class,'store']);
 Route::get('/payroll',[PayrollController::class,'index']);
+Route::patch('/payroll/{id}/paid',[PayrollController::class,'markAsPaid'])->name('payroll.paid');

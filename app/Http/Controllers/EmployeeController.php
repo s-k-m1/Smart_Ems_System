@@ -10,12 +10,21 @@ class EmployeeController extends Controller
         return view('EmployeeManagement.employees.create');
     }
     public function store(Request $request){
+        $request->validate([
+            'name'=>'required|max:100',
+            'email'=>'required|email|unique:employees,email',
+            'department'=>'required|max:100',
+            'position'=>'required|max:100',
+            'basic_salary'=> 'required|numeric|min:0',
+        ]);
+
         Employee::create([
-            'name'=>$request->name,
-            'email'=>$request->email,
-            'department'=>$request->department,
-            'position'=>$request->position,
+            'name'=>ucwords(strtolower(trim($request->name))),
+            'email'=>strtolower(trim($request->email)),
+            'department'=>ucwords(strtolower(trim($request->department))),
+            'position'=>ucwords(strtolower(trim($request->position))),
             'basic_salary'=>$request->basic_salary,
         ]);
+        return redirect('/employees/create') ->with('success','Employee added successfully.');
     }
 }
