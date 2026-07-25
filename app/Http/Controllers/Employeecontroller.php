@@ -25,7 +25,7 @@ class EmployeeController extends Controller
     {
         $validated = $this->validateEmployee($request);
 
-        Employee::create($validated);
+        $employee = Employee::create($validated);
 
         return redirect()->route('employees.index')->with('success', 'Employee added successfully.');
     }
@@ -53,8 +53,6 @@ class EmployeeController extends Controller
         return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
     }
 
-    // Shared validation for store() and update(). $ignoreId lets update()
-    // skip the unique check against the employee's own current record.
     private function validateEmployee(Request $request, $ignoreId = null)
     {
         return $request->validate([

@@ -1,27 +1,23 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Management</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-50 min-h-screen">
+@extends('CoreSystem.layouts.app')
 
-    <header class="bg-white border-b border-slate-200">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-semibold text-slate-800">Employee Management</h1>
-                <p class="text-sm text-slate-500 mt-1">View and manage all employees in your organization</p>
-            </div>
-            <a href="{{ route('employees.create') }}"
-               class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-sm font-medium">
-                + Add Employee
-            </a>
+@section('title', 'Employee Management')
+
+@section('content')
+
+<header class="bg-white border-b border-slate-200">
+    <div class="px-8 py-6 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-semibold text-slate-800">Employee Management</h1>
+            <p class="text-sm text-slate-500 mt-1">View and manage all employees in your organization</p>
         </div>
-    </header>
+        <a href="{{ route('employees.create') }}"
+           class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-sm font-medium">
+            + Add Employee
+        </a>
+    </div>
+</header>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<main class="px-8 py-8">
 
         @if (session('success'))
             <div class="mb-6 px-4 py-3 rounded-lg bg-green-100 text-green-700 text-sm">
@@ -205,5 +201,4 @@
         document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !modalOverlay.classList.contains('hidden')) closeModal(); });
     </script>
 
-</body>
-</html>
+@endsection

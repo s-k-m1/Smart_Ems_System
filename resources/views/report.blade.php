@@ -1,27 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reports - Smart EMS</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+@extends('CoreSystem.layouts.app')
 
-    <!-- ============ SIDEBAR (placeholder — replace with shared layout) ============ -->
-    <div class="flex">
+@section('title', 'Reports')
 
-        <aside class="w-48 bg-gray-800 text-white p-4">
-            <h1 class="font-bold text-lg mb-4">Smart EMS</h1>
-            <a href="#" class="block py-2">Dashboard</a>
-            <a href="#" class="block py-2">Employees</a>
-            <a href="#" class="block py-2">Attendance</a>
-            <a href="#" class="block py-2 bg-blue-600 px-2 rounded">Reports</a>
-            <a href="#" class="block py-2">Settings</a>
-        </aside>
+@section('content')
 
-        <!-- ============ MAIN CONTENT ============ -->
-        <main class="flex-1 p-6">
+        <div class="px-8 py-8">
 
             <h1 class="text-2xl font-bold mb-1">Reports</h1>
             <p class="text-gray-500 mb-4">Attendance, payroll, and employee distribution overview</p>
@@ -443,5 +426,4 @@
 
 </script>
 
-</body>
-</html>
+@endsection

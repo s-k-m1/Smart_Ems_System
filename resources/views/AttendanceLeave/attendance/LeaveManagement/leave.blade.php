@@ -1,13 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Leave Management</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@extends('CoreSystem.layouts.app')
 
-<body class="bg-gray-100">
+@section('title', 'Leave Management')
 
-<div class="max-w-7xl mx-auto p-8">
+@section('content')
+
+<div class="px-8 py-8">
 
 <!-- SUCCESS MESSAGE -->
 @if(session('success'))
@@ -134,7 +131,4 @@
 
 </div>
 
-</div>
-
-</body>
-</html>
+@endsection

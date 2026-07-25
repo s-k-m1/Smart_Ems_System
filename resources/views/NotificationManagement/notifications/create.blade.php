@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Notification</title>
+@extends('CoreSystem.layouts.app')
 
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
+@section('title', 'Create Notification')
 
-<body class="bg-slate-100">
+@section('content')
 
-<div class="max-w-5xl mx-auto mt-10 mb-10">
+<div class="px-8 py-8">
 
     <div class="bg-white rounded-2xl shadow-lg">
 
@@ -218,5 +212,4 @@
 
 </div>
 
-</body>
-</html>
+@endsection

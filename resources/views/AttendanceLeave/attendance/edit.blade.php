@@ -1,40 +1,10 @@
-<!DOCTYPE html>
-<html>
+@extends('CoreSystem.layouts.app')
 
-<head>
+@section('title', 'Edit Attendance')
 
-    <meta charset="UTF-8">
+@section('content')
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <title>
-        Edit Attendance
-    </title>
-
-</head>
-
-<body
-    class="
-        min-h-screen
-        bg-gradient-to-br
-        from-indigo-50
-        via-slate-50
-        to-blue-100
-    "
->
-
-    <div
-        class="
-            max-w-6xl
-            mx-auto
-            py-12
-            px-6
-        "
+    <div class="px-8 py-8"
     >
 
         <div
@@ -425,6 +395,4 @@
 
     </div>
 
-</body>
-
-</html>
+@endsection

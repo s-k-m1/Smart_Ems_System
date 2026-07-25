@@ -1,41 +1,25 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Employee Management System - Notifications</title>
+@extends('CoreSystem.layouts.app')
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+@section('title', 'Notifications')
 
-    <!-- Google Font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+@push('styles')
+<style>
+    body{
+        font-family:'Inter',sans-serif;
+    }
+    .scrollbar-hide::-webkit-scrollbar{
+        display:none;
+    }
+    .scrollbar-hide{
+        -ms-overflow-style:none;
+        scrollbar-width:none;
+    }
+</style>
+@endpush
 
-    <style>
-        body{
-            font-family:'Inter',sans-serif;
-            background:#f8fafc;
-        }
+@section('content')
 
-        .scrollbar-hide::-webkit-scrollbar{
-            display:none;
-        }
-
-        .scrollbar-hide{
-            -ms-overflow-style:none;
-            scrollbar-width:none;
-        }
-    </style>
-</head>
-
-<body class="bg-slate-100">
-
-<div class="min-h-screen">
-
-    {{-- Header --}}
-    @include('NotificationManagement.notifications.header')
-
-    <div class="max-w-7xl mx-auto px-6 py-6">
+    <div class="px-6 py-6">
 
         {{-- Tabs --}}
         @include('NotificationManagement.notifications.tabs')
@@ -81,6 +65,4 @@
 
     </div>
 
-</div>
-</body>
-</html>
+@endsection

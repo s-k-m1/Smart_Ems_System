@@ -6,21 +6,24 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up()
-{
-    Schema::create('company_settings', function (Blueprint $table) {
-        $table->id();
+    public function up(): void
+    {
+        Schema::create('company_settings', function (Blueprint $table) {
 
-        $table->integer('monthly_working_hours')->default(205);
+            $table->id();
 
-        $table->integer('annual_leave_days')->default(12);
+            $table->integer('monthly_working_hours')->default(205);
 
-        $table->string('weekly_holiday')->default('Saturday');
+            $table->integer('annual_leave_days')->default(12);
 
-        $table->timestamps();
-    });
-}
+            $table->string('weekly_holiday')->default('Saturday');
+
+            $table->timestamps();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('company_settings');
+    }
 };

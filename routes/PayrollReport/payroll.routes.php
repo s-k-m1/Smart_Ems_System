@@ -1,8 +1,9 @@
 <?php
 
+use App\Http\Controllers\PayrollReport\PayrollController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/payroll', function () {
-    return view('Payrollreport.payroll.index');
-})->name('payroll.index');
-
+Route::middleware(['web', 'auth', 'role:admin'])->group(function () {
+    Route::resource('payroll', PayrollController::class)
+        ->names('payroll');
+});

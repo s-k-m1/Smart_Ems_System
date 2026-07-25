@@ -1,1 +1,9 @@
-<h2>Dash board is working<h2>
+@extends('CoreSystem.layouts.app')
+
+@section('title', 'Dashboard')
+
+@section('content')
+<div class="p-8">
+    <h2 class="text-2xl font-bold text-slate-800">Dashboard is working</h2>
+</div>
+@endsection

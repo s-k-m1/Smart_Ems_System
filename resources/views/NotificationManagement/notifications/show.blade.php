@@ -1,15 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $notification->title }}</title>
+@extends('CoreSystem.layouts.app')
 
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
+@section('title', $notification->title)
 
-<div class="max-w-4xl mx-auto mt-10">
+@section('content')
+
+<div class="px-8 py-8">
 
     <div class="bg-white rounded-xl shadow-lg p-8">
 
@@ -77,5 +72,4 @@
 
 </div>
 
-</body>
-</html>
+@endsection

@@ -1,18 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Employee</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-slate-50 min-h-screen">
+@extends('CoreSystem.layouts.app')
 
-    <header class="bg-white border-b border-slate-200">
-        <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-            <h1 class="text-2xl font-semibold text-slate-800">Add Employee</h1>
-            <p class="text-sm text-slate-500 mt-1">Fill in the details to add a new employee</p>
-        </div>
+@section('title', 'Add Employee')
+
+@section('content')
+
+<header class="bg-white border-b border-slate-200">
+    <div class="px-8 py-6">
+        <h1 class="text-2xl font-semibold text-slate-800">Add Employee</h1>
+        <p class="text-sm text-slate-500 mt-1">Fill in the details to add a new employee</p>
+    </div>
     </header>
 
     <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -111,5 +107,4 @@
             </div>
         </form>
     </main>
-</body>
-</html>
+@endsection

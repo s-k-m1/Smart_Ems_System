@@ -1,40 +1,10 @@
-<!DOCTYPE html>
-<html>
+@extends('CoreSystem.layouts.app')
 
-<head>
+@section('title', 'Attendance Dashboard')
 
-    <meta charset="UTF-8">
+@section('content')
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <script src="https://cdn.tailwindcss.com"></script>
-
-    <title>
-        Attendance Dashboard
-    </title>
-
-</head>
-
-<body
-    class="
-        bg-[#F5F6FA]
-        min-h-screen
-        font-sans
-    "
->
-
-<div
-    class="
-        max-w-[1700px]
-        mx-auto
-        px-6
-        lg:px-8
-        py-10
-    "
->
+<div class="px-8 py-8">
 
     {{-- Action Buttons --}}
     <div
@@ -227,7 +197,4 @@
 
  @endif
 
-</div>
-</body>
-
-</html>
+@endsection

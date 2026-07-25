@@ -20,11 +20,7 @@ return new class extends Migration
 
             $table->string('department')->nullable();
 
-            $table->enum('priority', [
-                'Low',
-                'Medium',
-                'High'
-            ])->default('Medium');
+            $table->string('priority', 10)->default('Medium');
 
             $table->boolean('is_pinned')->default(false);
 

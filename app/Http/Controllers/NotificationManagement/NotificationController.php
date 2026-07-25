@@ -12,7 +12,21 @@ class NotificationController extends Controller
     //  Display Notifications
     public function index(Request $request)
     {
+        $user = auth()->user();
+
         $query = Notification::query();
+
+        // Employee: only see notifications meant for them or general ones
+        if ($user->isEmployee()) {
+            $employee = $user->employee;
+            $query->where(function ($q) use ($employee) {
+                $q->whereNull('department')
+                  ->orWhere('department', '');
+                if ($employee) {
+                    $q->orWhere('department', $employee->department);
+                }
+            });
+        }
 
         // Search
         if ($request->filled('search')) {
@@ -65,7 +79,7 @@ class NotificationController extends Controller
 
    
     //  Store Notification
-     
+      
     public function store(Request $request)
     {
         $request->validate([
@@ -113,6 +127,13 @@ class NotificationController extends Controller
         return redirect()
             ->route('notifications.index')
             ->with('success', 'Notification Created Successfully.');
+    }
+
+    //  Edit Notification
+    public function edit($id)
+    {
+        $notification = Notification::findOrFail($id);
+        return view('NotificationManagement.notifications.edit', compact('notification'));
     }
 
     //  Show Notification
