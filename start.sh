@@ -4,6 +4,9 @@ set -e
 echo "=== Fixing permissions ==="
 chmod -R 777 storage database bootstrap/cache 2>/dev/null || true
 
+echo "=== Setting queue to database ==="
+export QUEUE_CONNECTION=database
+
 echo "=== Caching config ==="
 php artisan config:cache || echo "Config cache skipped"
 
@@ -20,7 +23,6 @@ echo "=== Seeding admin user ==="
 php artisan db:seed --class=AdminSeeder --force || echo "Admin seeder skipped"
 
 echo "=== Starting queue worker ==="
-export QUEUE_CONNECTION=database
 php artisan queue:work --tries=3 --timeout=90 --sleep=3 -q &
 echo "Queue worker started"
 
