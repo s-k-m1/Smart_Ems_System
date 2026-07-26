@@ -7,6 +7,7 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use Illuminate\Http\Request;
 use App\Models\CompanySetting;
+use Illuminate\Support\Facades\DB;
 
 class AttendanceDashboardController extends Controller
 {
@@ -50,26 +51,24 @@ class AttendanceDashboardController extends Controller
         $total = $present + $late + $undertime + $absent;
         $rate = $total ? round(($present / $total) * 100) : 0;
 
-        // Current month working hours - single query
+        // Current month working hours
         $currentMonthHours = Attendance::where('employee_id', $employeeId)
-            ->whereMonth('date', now()->month)
-            ->whereYear('date', now()->year)
+            ->whereRaw("strftime('%m', date) = ?", [now()->format('m')])
+            ->whereRaw("strftime('%Y', date) = ?", [now()->format('Y')])
             ->sum('working_hours');
 
-        // Monthly attendance chart - ONE query with GROUP BY month, status
+        // Monthly attendance chart - fetch all records for the year, group in PHP (cross-database)
         $monthlyRaw = Attendance::where('employee_id', $employeeId)
-            ->whereYear('date', now()->year)
-            ->whereMonth('date', '<=', now()->month)
-            ->selectRaw("MONTH(date) as m, status, COUNT(*) as count")
-            ->groupBy('m', 'status')
-            ->get();
+            ->whereRaw("strftime('%Y', date) = ?", [now()->format('Y')])
+            ->whereRaw("strftime('%m', date) <= ?", [now()->format('m')])
+            ->get(['date', 'status']);
 
-        $monthlyGrouped = $monthlyRaw->groupBy('m');
+        $monthlyGrouped = $monthlyRaw->groupBy(fn($r) => (int)$r->date->format('m'));
         $monthlyAttendance = [];
         for ($month = 1; $month <= now()->month; $month++) {
             $monthData = $monthlyGrouped->get($month, collect());
-            $monthPresent = $monthData->where('status', 'Present')->sum('count');
-            $monthTotal = $monthData->sum('count');
+            $monthPresent = $monthData->where('status', 'Present')->count();
+            $monthTotal = $monthData->count();
             $percentage = $monthTotal ? round(($monthPresent / $monthTotal) * 100) : 0;
             $monthlyAttendance[] = [
                 'month' => date('F', mktime(0, 0, 0, $month, 1)),
@@ -77,20 +76,20 @@ class AttendanceDashboardController extends Controller
             ];
         }
 
-        // Weekly summary - ONE query for present counts per day
+        // Weekly summary - fetch and group in PHP (cross-database)
         $weekStart = now()->startOfWeek();
         $weekEnd = $weekStart->copy()->addDays(5);
-        $weeklyRaw = Attendance::whereBetween('date', [$weekStart, $weekEnd])
+        $weeklyRecords = Attendance::whereBetween('date', [$weekStart, $weekEnd])
             ->where('status', 'Present')
-            ->selectRaw("DATE(date) as d, COUNT(*) as count")
-            ->groupBy('d')
-            ->pluck('count', 'd');
+            ->get(['date']);
+
+        $weeklyGrouped = $weeklyRecords->groupBy(fn($r) => $r->date->format('Y-m-d'));
 
         $totalEmployees = Employee::count();
         $weeklySummary = [];
         for ($i = 0; $i < 6; $i++) {
             $dayDate = $weekStart->copy()->addDays($i);
-            $presentCount = $weeklyRaw->get($dayDate->format('Y-m-d'), 0);
+            $presentCount = ($weeklyGrouped->get($dayDate->format('Y-m-d'), collect()))->count();
             $percentage = $totalEmployees ? round(($presentCount / $totalEmployees) * 100) : 0;
             $weeklySummary[] = [
                 'day' => $dayDate->format('l'),

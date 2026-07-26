@@ -48,7 +48,7 @@
                     data-delete-url="{{ route('employees.destroy', $employee->id) }}"
                 >
                     <div class="flex items-center gap-4">
-                        <img src="{{ $employee->image }}" alt="{{ $employee->name }}"
+                        <img src="{{ $employee->image ?? 'https://ui-avatars.com/api/?name=' . urlencode($employee->name) . '&background=e8f1ff&color=1e40af&size=64' }}" alt="{{ $employee->name }}"
                              class="w-16 h-16 rounded-full object-cover border border-slate-200">
                         <div class="flex-1 min-w-0">
                             <h3 class="font-semibold text-slate-800 truncate">{{ $employee->name }}</h3>
@@ -147,7 +147,7 @@
         function openModal(card) {
             const status = card.dataset.status;
 
-            document.getElementById('modalImage').src = card.dataset.image;
+            document.getElementById('modalImage').src = card.dataset.image || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(card.dataset.name) + '&background=e8f1ff&color=1e40af&size=180';
             document.getElementById('modalImage').alt = card.dataset.name;
             document.getElementById('modalName').textContent = card.dataset.name;
             document.getElementById('modalPosition').textContent = card.dataset.position;
