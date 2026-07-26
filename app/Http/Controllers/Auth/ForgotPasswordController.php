@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Notifications\PasswordReset;
+use App\Notifications\PlainPasswordReset;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Password;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
 {
@@ -22,16 +24,18 @@ class ForgotPasswordController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return back()->withErrors(['email' => "We can't find a user with that email address."]);
+            return redirect()->route('password.request')->withErrors(['email' => "We can't find a user with that email address."]);
         }
 
-        try {
-            $token = Password::createToken($user);
-            $user->notify(new PasswordReset($token));
-        } catch (\Throwable $e) {
-            \Log::error('Password reset failed: ' . $e->getMessage());
-            return back()->withErrors(['email' => 'Could not send reset link. Please try again later.']);
-        }
+        $token = Str::random(60);
+        $hashed = hash('sha256', $token);
+
+        DB::table('password_reset_tokens')->updateOrInsert(
+            ['email' => $user->email],
+            ['email' => $user->email, 'token' => $hashed, 'created_at' => now()]
+        );
+
+        $user->notify(new PasswordReset($token));
 
         return redirect()->route('password.request')->with(['status' => 'We have emailed your password reset link!']);
     }
