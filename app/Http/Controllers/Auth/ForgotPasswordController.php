@@ -18,21 +18,10 @@ class ForgotPasswordController extends Controller
     {
         $request->validate(['email' => 'required|email']);
 
-        $user = User::where('email', $request->email)->first();
+        $status = Password::sendResetLink($request->only('email'));
 
-        if (!$user) {
-            return back()->withErrors(['email' => "We can't find a user with that email address."]);
-        }
-
-        $token = Password::createToken($user);
-
-        app()->terminating(function () use ($user, $token) {
-            if (function_exists('fastcgi_finish_request')) {
-                fastcgi_finish_request();
-            }
-            $user->sendPasswordResetNotification($token);
-        });
-
-        return back()->with(['status' => 'We have emailed your password reset link!']);
+        return $status === Password::RESET_LINK_SENT
+            ? back()->with(['status' => 'We have emailed your password reset link!'])
+            : back()->withErrors(['email' => __($status)]);
     }
 }

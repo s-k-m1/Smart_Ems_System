@@ -49,5 +49,11 @@
             </p>
         </div>
     </div>
+<script>
+setTimeout(function(){
+    var el = document.querySelector('.bg-green-50, .bg-red-50');
+    if (el) el.style.display = 'none';
+}, 3000);
+</script>
 </body>
 </html>
