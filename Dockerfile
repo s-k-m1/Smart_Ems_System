@@ -4,32 +4,26 @@ WORKDIR /var/www/html
 
 # System dependencies
 RUN apt-get update && apt-get install -y \
-    git \
-    curl \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    nginx \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    git curl libpng-dev libonig-dev libxml2-dev zip unzip nginx \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # PHP extensions
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 
-# Composer
-COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
+# Install Composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
+# Copy application
 COPY . .
 
-RUN composer install --no-dev --optimize-autoloader --no-interaction \
-    && php artisan config:cache \
-    && php artisan view:cache \
-    && php artisan route:cache || true \
-    && php artisan storage:link --force || true \
-    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Install dependencies and optimize
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-cache
+RUN php artisan config:cache || true
+RUN php artisan view:cache || true
+RUN php artisan storage:link --force || true
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
+# Nginx config
 COPY nginx.conf /etc/nginx/sites-enabled/default
 
 EXPOSE 8080
