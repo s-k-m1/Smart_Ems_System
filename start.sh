@@ -4,9 +4,6 @@ set -e
 echo "=== Fixing permissions ==="
 chmod -R 777 storage database bootstrap/cache 2>/dev/null || true
 
-echo "=== Configuring log channel ==="
-export LOG_CHANNEL=stderr
-
 echo "=== Caching config ==="
 php artisan config:cache || echo "Config cache skipped"
 

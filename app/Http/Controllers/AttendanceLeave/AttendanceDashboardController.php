@@ -189,7 +189,7 @@ class AttendanceDashboardController extends Controller
 
     $request->validate([
         'employee_id' => 'required|exists:employees,id',
-        'date' => 'required|date|date_equals:' . $attendance->date->format('Y-m-d'),
+        'date' => 'required|date|date_equals:' . \Carbon\Carbon::parse($attendance->date)->format('Y-m-d'),
         'check_in' => 'nullable',
         'check_out' => 'nullable',
     ]);
