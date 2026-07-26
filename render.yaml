@@ -1,11 +1,9 @@
 services:
   - type: web
     name: smart-ems
-    runtime: php
+    runtime: docker
     region: singapore
     plan: free
-    buildCommand: ./build.sh
-    startCommand: ./start.sh
     envVars:
       - key: APP_ENV
         value: production
