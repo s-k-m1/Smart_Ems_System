@@ -23,14 +23,6 @@ class ForgotPasswordController extends Controller
             return $this->showLinkRequestForm();
         }
 
-        $request->validate(['email' => 'required|email']);
-
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return response('USER NOT FOUND', 200);
-        }
-
-        return response('USER FOUND: ' . $user->name . ' | Email: ' . $user->email, 200);
+        return response('POST OK: ' . $request->input('email', 'no-email'), 200);
     }
 }
