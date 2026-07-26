@@ -12,6 +12,9 @@ fi
 echo "=== Running migrations ==="
 php artisan migrate --force || echo "Migrations failed — continuing"
 
+echo "=== Seeding admin user ==="
+php artisan db:seed --class=AdminSeeder --force || echo "Admin seeder skipped"
+
 echo "=== Starting PHP-FPM & Nginx ==="
 php-fpm -D
 nginx -g "daemon off;"
