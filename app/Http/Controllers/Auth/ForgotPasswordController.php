@@ -14,6 +14,6 @@ class ForgotPasswordController extends Controller
 
     public function sendResetLinkEmail(Request $request)
     {
-        return response('OK', 200);
+        return view('CoreSystem.auth.forgot-password');
     }
 }
