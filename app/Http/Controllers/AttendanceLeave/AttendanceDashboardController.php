@@ -12,34 +12,41 @@ use Illuminate\Support\Facades\DB;
 class AttendanceDashboardController extends Controller
 {
     // DASHBOARD
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
 
-        $employeeId = null;
-
-        if ($user->isEmployee()) {
-            $employee = Employee::where('user_id', $user->id)->first();
-            if (!$employee) {
-                return view('AttendanceLeave.attendance.index', ['employee' => null]);
-            }
-            $employeeId = $employee->id;
-        } else {
-            $employee = Employee::first();
-            if (!$employee) {
-                return view('AttendanceLeave.attendance.index', ['employee' => null]);
-            }
-            $employeeId = $employee->id;
-        }
-
-        // Company Settings (cached in memory for the request)
+        // Company Settings
         $settings = CompanySetting::first();
         $monthlyWorkingHours = $settings->monthly_working_hours ?? 205;
         $annualLeaves = $settings->annual_leave_days ?? 12;
         $weeklyHoliday = $settings->weekly_holiday ?? 'Saturday';
 
-        // All attendance counts in ONE query with GROUP BY
-        $counts = Attendance::where('employee_id', $employeeId)
+        $allEmployees = Employee::all();
+
+        if ($user->isEmployee()) {
+            $employee = $user->employee;
+            if (!$employee) {
+                return view('AttendanceLeave.attendance.index', ['employee' => null]);
+            }
+            $selectedEmployeeId = $employee->id;
+            $employeesForSelect = collect();
+        } else {
+            // Admin/HR: allow selecting employee via ?employee=X, default to first
+            $selectedEmployeeId = $request->integer('employee');
+            if (!$selectedEmployeeId || !$allEmployees->contains('id', $selectedEmployeeId)) {
+                $selectedEmployeeId = $allEmployees->first()?->id;
+            }
+            $employee = $allEmployees->firstWhere('id', $selectedEmployeeId);
+            $employeesForSelect = $allEmployees;
+
+            if (!$employee) {
+                return view('AttendanceLeave.attendance.index', ['employee' => null]);
+            }
+        }
+
+        // All attendance counts
+        $counts = Attendance::where('employee_id', $selectedEmployeeId)
             ->selectRaw("status, COUNT(*) as count")
             ->groupBy('status')
             ->pluck('count', 'status');
@@ -52,13 +59,13 @@ class AttendanceDashboardController extends Controller
         $rate = $total ? round(($present / $total) * 100) : 0;
 
         // Current month working hours
-        $currentMonthHours = Attendance::where('employee_id', $employeeId)
+        $currentMonthHours = Attendance::where('employee_id', $selectedEmployeeId)
             ->whereRaw("strftime('%m', date) = ?", [now()->format('m')])
             ->whereRaw("strftime('%Y', date) = ?", [now()->format('Y')])
             ->sum('working_hours');
 
-        // Monthly attendance chart - fetch all records for the year, group in PHP (cross-database)
-        $monthlyRaw = Attendance::where('employee_id', $employeeId)
+        // Monthly chart
+        $monthlyRaw = Attendance::where('employee_id', $selectedEmployeeId)
             ->whereRaw("strftime('%Y', date) = ?", [now()->format('Y')])
             ->whereRaw("strftime('%m', date) <= ?", [now()->format('m')])
             ->get(['date', 'status']);
@@ -76,29 +83,28 @@ class AttendanceDashboardController extends Controller
             ];
         }
 
-        // Weekly summary - fetch and group in PHP (cross-database)
+        // Weekly summary
         $weekStart = now()->startOfWeek();
         $weekEnd = $weekStart->copy()->addDays(5);
         $weeklyRecords = Attendance::whereBetween('date', [$weekStart, $weekEnd])
             ->where('status', 'Present')
-            ->get(['date']);
+            ->get(['date', 'employee_id']);
 
         $weeklyGrouped = $weeklyRecords->groupBy(fn($r) => $r->date->format('Y-m-d'));
-
         $totalEmployees = Employee::count();
         $weeklySummary = [];
         for ($i = 0; $i < 6; $i++) {
             $dayDate = $weekStart->copy()->addDays($i);
             $presentCount = ($weeklyGrouped->get($dayDate->format('Y-m-d'), collect()))->count();
-            $percentage = $totalEmployees ? round(($presentCount / $totalEmployees) * 100) : 0;
             $weeklySummary[] = [
                 'day' => $dayDate->format('l'),
-                'present' => $percentage,
+                'present' => $totalEmployees ? round(($presentCount / $totalEmployees) * 100) : 0,
             ];
         }
 
         return view('AttendanceLeave.attendance.index', compact(
-            'employee', 'present', 'late', 'undertime', 'absent', 'rate',
+            'employee', 'employeesForSelect',
+            'present', 'late', 'undertime', 'absent', 'rate',
             'monthlyAttendance', 'monthlyWorkingHours', 'annualLeaves',
             'weeklyHoliday', 'currentMonthHours', 'weeklySummary'
         ));
@@ -113,17 +119,28 @@ class AttendanceDashboardController extends Controller
     // STORE
     public function store(Request $request)
 {
+    $request->validate([
+        'employee_id' => 'required|exists:employees,id',
+        'status' => 'required|in:Present,Late,Undertime,Absent',
+        'date' => 'required|date',
+        'check_in' => 'nullable',
+        'check_out' => 'nullable',
+    ]);
+
+    // prevent duplicate attendance for same employee on same date
+    $exists = Attendance::where('employee_id', $request->employee_id)
+        ->where('date', $request->date)
+        ->exists();
+
+    if ($exists) {
+        return back()->withErrors(['date' => 'Attendance already exists for this employee on this date.'])->withInput();
+    }
+
     $workingHours = 0;
-
     if ($request->check_in && $request->check_out) {
-
         $checkIn = strtotime($request->check_in);
         $checkOut = strtotime($request->check_out);
-
-        $workingHours = round(
-            ($checkOut - $checkIn) / 3600,
-            2
-        );
+        $workingHours = round(($checkOut - $checkIn) / 3600, 2);
     }
 
     Attendance::create([
@@ -135,7 +152,7 @@ class AttendanceDashboardController extends Controller
         'working_hours' => $workingHours,
     ]);
 
-    return redirect('/attendance');
+    return redirect('/attendance?employee=' . $request->employee_id)->with('success', 'Attendance recorded successfully.');
 }
 
     // EDIT PAGE
@@ -152,17 +169,19 @@ class AttendanceDashboardController extends Controller
 {
     $attendance = Attendance::findOrFail($id);
 
+    $request->validate([
+        'employee_id' => 'required|exists:employees,id',
+        'status' => 'required|in:Present,Late,Undertime,Absent',
+        'date' => 'required|date',
+        'check_in' => 'nullable',
+        'check_out' => 'nullable',
+    ]);
+
     $workingHours = 0;
-
     if ($request->check_in && $request->check_out) {
-
         $checkIn = strtotime($request->check_in);
         $checkOut = strtotime($request->check_out);
-
-        $workingHours = round(
-            ($checkOut - $checkIn) / 3600,
-            2
-        );
+        $workingHours = round(($checkOut - $checkIn) / 3600, 2);
     }
 
     $attendance->update([
@@ -174,14 +193,16 @@ class AttendanceDashboardController extends Controller
         'working_hours' => $workingHours,
     ]);
 
-    return redirect('/attendance');
+    return redirect('/attendance?employee=' . $request->employee_id)->with('success', 'Attendance updated successfully.');
 }
 
     // DELETE
     public function destroy($id)
     {
-        Attendance::findOrFail($id)->delete();
-        return redirect('/attendance');
+        $attendance = Attendance::findOrFail($id);
+        $employeeId = $attendance->employee_id;
+        $attendance->delete();
+        return redirect('/attendance?employee=' . $employeeId)->with('success', 'Attendance deleted successfully.');
     }
     
 

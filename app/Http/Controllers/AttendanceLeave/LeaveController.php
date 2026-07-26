@@ -29,7 +29,7 @@ class LeaveController extends Controller
         }
 
         // Admin / HR: see all leave records
-        $history = Leave::orderBy('created_at', 'desc')->get();
+        $history = Leave::with('employee')->orderBy('created_at', 'desc')->get();
 
         return view('AttendanceLeave.attendance.LeaveManagement.leave', compact('history'));
     }
@@ -66,5 +66,23 @@ class LeaveController extends Controller
         Leave::create($data);
 
         return redirect('/leave')->with('success', 'Leave Applied Successfully');
+    }
+
+    public function approve($id)
+    {
+        $leave = Leave::findOrFail($id);
+        $leave->status = 'Approved';
+        $leave->approver = auth()->user()->name;
+        $leave->save();
+        return redirect('/leave')->with('success', 'Leave approved successfully.');
+    }
+
+    public function reject($id)
+    {
+        $leave = Leave::findOrFail($id);
+        $leave->status = 'Rejected';
+        $leave->approver = auth()->user()->name;
+        $leave->save();
+        return redirect('/leave')->with('success', 'Leave rejected.');
     }
 }

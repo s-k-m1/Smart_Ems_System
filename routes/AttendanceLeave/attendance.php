@@ -20,7 +20,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/attendance/{id}/edit', [AttendanceDashboardController::class, 'edit'])->middleware('role:admin,hr');
     Route::post('/attendance/{id}/update', [AttendanceDashboardController::class, 'update'])->middleware('role:admin,hr');
 
-    Route::get('/attendance/{id}/delete', [AttendanceDashboardController::class, 'destroy'])->middleware('role:admin,hr');
+    Route::delete('/attendance/{id}/delete', [AttendanceDashboardController::class, 'destroy'])->middleware('role:admin,hr');
 
     Route::get('/attendance/report', [AttendanceDashboardController::class, 'report'])->middleware('role:admin,hr');
 
@@ -32,6 +32,8 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::get('/leave', [LeaveController::class, 'index']);
     Route::post('/leave/store', [LeaveController::class,'store'])->middleware('role:admin,hr,employee');
+    Route::post('/leave/{id}/approve', [LeaveController::class, 'approve'])->middleware('role:admin,hr');
+    Route::post('/leave/{id}/reject', [LeaveController::class, 'reject'])->middleware('role:admin,hr');
 
     /*
     |--------------------------------------------------------------------------

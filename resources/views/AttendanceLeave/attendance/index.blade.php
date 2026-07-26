@@ -6,16 +6,16 @@
 
 <div class="px-4 sm:px-8 py-4 sm:py-8">
 
-    {{-- Action Buttons --}}
+    {{-- Action Buttons + Employee Selector --}}
     <div
         class="
             flex
             flex-wrap
+            items-center
             gap-4
             mb-8
         "
     >
-
         <a
             href="/attendance/create"
             class="
@@ -48,7 +48,27 @@
             Report
         </a>
 
+        @if($employeesForSelect->isNotEmpty())
+        <div class="ml-auto">
+            <select id="employeeSelect" onchange="window.location.href='/attendance?employee='+this.value"
+                class="rounded-2xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                @foreach($employeesForSelect as $emp)
+                    <option value="{{ $emp->id }}" {{ $emp->id === $employee?->id ? 'selected' : '' }}>
+                        {{ $emp->name }} ({{ $emp->employee_id }})
+                    </option>
+                @endforeach
+            </select>
+        </div>
+        @endif
+
     </div>
+
+    @if(session('success'))
+        <div class="mb-6 px-4 py-3 rounded-xl bg-green-100 text-green-700 text-sm font-medium">{{ session('success') }}</div>
+    @endif
+    @if(session('error'))
+        <div class="mb-6 px-4 py-3 rounded-xl bg-red-100 text-red-700 text-sm font-medium">{{ session('error') }}</div>
+    @endif
 
     @if($employee)
 

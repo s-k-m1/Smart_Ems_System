@@ -57,6 +57,18 @@
 
             </div>
 
+            @if ($errors->any())
+                <div class="p-4 sm:p-10 pb-0">
+                    <div class="px-4 py-3 rounded-xl bg-red-100 text-red-700 text-sm">
+                        <ul class="list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
+            @endif
+
             <form
                 action="/attendance/store"
                 method="POST"

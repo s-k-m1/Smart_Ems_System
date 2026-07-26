@@ -341,21 +341,25 @@
                                 ✏ Edit
                             </a>
 
-                            <a
-                                href="/attendance/{{ $att->id }}/delete"
-                                class="
-                                    text-center
-                                    px-4
-                                    py-2
-                                    rounded-xl
-                                    bg-red-100
-                                    text-red-600
-                                    hover:bg-red-200
-                                    transition
-                                "
-                            >
-                                🗑 Delete
-                            </a>
+                            <form action="/attendance/{{ $att->id }}/delete" method="POST" onsubmit="return confirm('Delete this attendance record?')" class="inline">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit"
+                                    class="
+                                        text-center
+                                        px-4
+                                        py-2
+                                        rounded-xl
+                                        bg-red-100
+                                        text-red-600
+                                        hover:bg-red-200
+                                        transition
+                                        cursor-pointer
+                                    "
+                                >
+                                    🗑 Delete
+                                </button>
+                            </form>
 
                         </div>
 

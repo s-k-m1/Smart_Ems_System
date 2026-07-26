@@ -2,72 +2,63 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attendance;
+use App\Models\Employee;
+use App\Models\Payroll;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        // attendence with dummy data
-        $attendanceData = [
-            ['id' => 1, 'name' => 'Ram Sharma',   'date' => '2026-06-01', 'status' => 'Present'],
-            ['id' => 2, 'name' => 'Sita Rai',     'date' => '2026-06-01', 'status' => 'Absent'],
-            ['id' => 3, 'name' => 'Amit Yadav',   'date' => '2026-06-01', 'status' => 'Present'],
-            ['id' => 4, 'name' => 'Nisha Karki',  'date' => '2026-06-02', 'status' => 'Leave'],
-        ];
+        // ── Attendance Data ──────────────────────────────────────────
+        $attendanceQuery = Attendance::with('employee');
+        $attendanceData = $attendanceQuery->get()->map(fn($a) => [
+            'id'     => $a->id,
+            'name'   => $a->employee->name,
+            'date'   => $a->date,
+            'status' => $a->status === 'Late' || $a->status === 'Undertime' ? 'Present' : $a->status,
+        ])->values()->toArray();
 
         $attendanceEmployees = collect($attendanceData)->pluck('name')->unique()->sort()->values()->all();
 
         $attendanceSummary = [
             'total'   => count($attendanceData),
-            'present' => count(array_filter($attendanceData, fn ($r) => $r['status'] === 'Present')),
-            'absent'  => count(array_filter($attendanceData, fn ($r) => $r['status'] === 'Absent')),
-            'leave'   => count(array_filter($attendanceData, fn ($r) => $r['status'] === 'Leave')),
+            'present' => count(array_filter($attendanceData, fn($r) => $r['status'] === 'Present')),
+            'absent'  => count(array_filter($attendanceData, fn($r) => $r['status'] === 'Absent')),
+            'leave'   => count(array_filter($attendanceData, fn($r) => $r['status'] === 'Leave')),
         ];
-// payrol with dummy data 
-        $payrollData = [
-            ['id' => 1, 'name' => 'Ram Sharma',   'salary' => 45000, 'status' => 'Paid'],
-            ['id' => 2, 'name' => 'Sita Rai',     'salary' => 38000, 'status' => 'Pending'],
-            ['id' => 3, 'name' => 'Amit Yadav',   'salary' => 42000, 'status' => 'Paid'],
-            ['id' => 4, 'name' => 'Nisha Karki',  'salary' => 50000, 'status' => 'Paid'],
-            ['id' => 5, 'name' => 'Bikash Thapa', 'salary' => 36000, 'status' => 'Pending'],
-        ];
+
+        // ── Payroll Data ─────────────────────────────────────────────
+        $payrollQuery = Payroll::with('employee');
+        $payrollData = $payrollQuery->get()->map(fn($p) => [
+            'id'     => $p->id,
+            'name'   => $p->employee->name,
+            'salary' => (float) $p->net_pay,
+            'status' => $p->status === 'paid' ? 'Paid' : ($p->status === 'pending' ? 'Pending' : ucfirst($p->status)),
+        ])->values()->toArray();
 
         $payrollSummary = [
             'total_employees' => count($payrollData),
             'total_payroll'   => array_sum(array_column($payrollData, 'salary')),
-            'paid'            => count(array_filter($payrollData, fn ($r) => $r['status'] === 'Paid')),
-            'pending'         => count(array_filter($payrollData, fn ($r) => $r['status'] === 'Pending')),
+            'paid'            => count(array_filter($payrollData, fn($r) => $r['status'] === 'Paid')),
+            'pending'         => count(array_filter($payrollData, fn($r) => $r['status'] === 'Pending')),
         ];
-// employee distribution with dummy data 
-        $distributionData = [
-            ['id' => 1, 'name' => 'Ram Sharma',   'department' => 'IT',        'designation' => 'Developer'],
-            ['id' => 2, 'name' => 'Sita Rai',     'department' => 'HR',        'designation' => 'HR Officer'],
-            ['id' => 3, 'name' => 'Amit Yadav',   'department' => 'Finance',   'designation' => 'Accountant'],
-            ['id' => 4, 'name' => 'Nisha Karki',  'department' => 'IT',        'designation' => 'QA Engineer'],
-            ['id' => 5, 'name' => 'Bikash Thapa', 'department' => 'Sales',     'designation' => 'Sales Executive'],
-            ['id' => 6, 'name' => 'Puja Gurung',  'department' => 'Finance',   'designation' => 'Finance Manager'],
-            ['id' => 7, 'name' => 'Suresh Magar', 'department' => 'Sales',     'designation' => 'Sales Executive'],
-        ];
+
+        // ── Distribution Data ────────────────────────────────────────
+        $distributionData = Employee::all()->map(fn($e) => [
+            'id'          => $e->id,
+            'name'        => $e->name,
+            'department'  => $e->department,
+            'designation' => $e->position,
+        ])->values()->toArray();
 
         $departments = collect($distributionData)->pluck('department')->unique()->sort()->values()->all();
 
-        $distributionSummary = collect($distributionData)
-            ->groupBy('department')
-            ->map(fn ($rows) => $rows->count())
-            ->toArray();
-
-        return view('report', [
-            'attendanceData'      => $attendanceData,
-            'attendanceEmployees' => $attendanceEmployees,
-            'attendanceSummary'   => $attendanceSummary,
-
-            'payrollData'    => $payrollData,
-            'payrollSummary' => $payrollSummary,
-
-            'distributionData'    => $distributionData,
-            'departments'         => $departments,
-            'distributionSummary' => $distributionSummary,
-        ]);
+        return view('report', compact(
+            'attendanceData', 'attendanceEmployees', 'attendanceSummary',
+            'payrollData', 'payrollSummary',
+            'distributionData', 'departments'
+        ));
     }
 }
