@@ -30,10 +30,11 @@ class DashboardController extends Controller
 
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
-            $month = $date->format('Y-m');
             $label = $date->format('M');
+            $monthStart = $date->startOfMonth()->format('Y-m-d');
+            $monthEnd = $date->copy()->endOfMonth()->format('Y-m-d');
 
-            $records = Attendance::whereRaw("strftime('%Y-%m', date) = ?", [$month])
+            $records = Attendance::whereBetween('date', [$monthStart, $monthEnd])
                 ->selectRaw("status, COUNT(*) as count")
                 ->groupBy('status')
                 ->get()

@@ -61,14 +61,12 @@ class AttendanceDashboardController extends Controller
 
         // Current month working hours
         $currentMonthHours = Attendance::where('employee_id', $selectedEmployeeId)
-            ->whereRaw("strftime('%m', date) = ?", [now()->format('m')])
-            ->whereRaw("strftime('%Y', date) = ?", [now()->format('Y')])
+            ->whereBetween('date', [now()->startOfMonth()->format('Y-m-d'), now()->format('Y-m-d')])
             ->sum('working_hours');
 
         // Monthly chart
         $monthlyRaw = Attendance::where('employee_id', $selectedEmployeeId)
-            ->whereRaw("strftime('%Y', date) = ?", [now()->format('Y')])
-            ->whereRaw("strftime('%m', date) <= ?", [now()->format('m')])
+            ->whereBetween('date', [now()->startOfYear()->format('Y-m-d'), now()->format('Y-m-d')])
             ->get(['date', 'status']);
 
         $monthlyGrouped = $monthlyRaw->groupBy(fn($r) => (int)$r->date->format('m'));
