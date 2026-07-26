@@ -138,7 +138,7 @@ class AttendanceDashboardController extends Controller
 {
     $request->validate([
         'employee_id' => 'required|exists:employees,id',
-        'date' => 'required|date',
+        'date' => 'required|date|after_or_equal:today|before_or_equal:today',
         'check_in' => 'nullable',
         'check_out' => 'nullable',
     ]);
@@ -189,7 +189,7 @@ class AttendanceDashboardController extends Controller
 
     $request->validate([
         'employee_id' => 'required|exists:employees,id',
-        'date' => 'required|date',
+        'date' => 'required|date|date_equals:' . $attendance->date->format('Y-m-d'),
         'check_in' => 'nullable',
         'check_out' => 'nullable',
     ]);

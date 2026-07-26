@@ -162,6 +162,8 @@
                             name="date"
                             value="{{ $attendance->date }}"
                             required
+                            min="{{ $attendance->date }}"
+                            max="{{ $attendance->date }}"
                             class="
                                 w-full
                                 rounded-[24px]

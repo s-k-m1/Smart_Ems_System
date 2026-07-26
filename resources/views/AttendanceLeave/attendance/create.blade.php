@@ -165,6 +165,9 @@
                             type="date"
                             name="date"
                             required
+                            value="{{ date('Y-m-d') }}"
+                            min="{{ date('Y-m-d') }}"
+                            max="{{ date('Y-m-d') }}"
                             class="
                                 w-full
                                 rounded-3xl
