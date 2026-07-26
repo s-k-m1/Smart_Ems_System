@@ -18,11 +18,8 @@ _test2.php
 _test3.php
 _test4.php
 
-/vendor
-/node_modules
-
 /.idea
 /.vscode
 
 npm-debug.log
-yarn-error.log                                                                                                                                                                                                                                                                                                                                                                           
+yarn-error.log

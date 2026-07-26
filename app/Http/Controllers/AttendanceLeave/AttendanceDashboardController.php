@@ -15,277 +15,95 @@ class AttendanceDashboardController extends Controller
     {
         $user = auth()->user();
 
-        // Employee: only see own records
+        $employeeId = null;
+
         if ($user->isEmployee()) {
             $employee = Employee::where('user_id', $user->id)->first();
-
             if (!$employee) {
-                return view('AttendanceLeave.attendance.index', [
-                    'employee' => null
-                ]);
+                return view('AttendanceLeave.attendance.index', ['employee' => null]);
             }
-
-            // Company Settings
-            $settings = CompanySetting::first();
-            $monthlyWorkingHours = $settings->monthly_working_hours ?? 205;
-            $annualLeaves = $settings->annual_leave_days ?? 12;
-            $weeklyHoliday = $settings->weekly_holiday ?? 'Saturday';
-
-            // Attendance Counts
-            $present = Attendance::where('employee_id', $employee->id)->where('status', 'Present')->count();
-            $late = Attendance::where('employee_id', $employee->id)->where('status', 'Late')->count();
-            $undertime = Attendance::where('employee_id', $employee->id)->where('status', 'Undertime')->count();
-            $absent = Attendance::where('employee_id', $employee->id)->where('status', 'Absent')->count();
-            $total = $present + $late + $undertime + $absent;
-            $rate = $total ? round(($present / $total) * 100) : 0;
-
-            $currentMonthHours = Attendance::where('employee_id', $employee->id)
-                ->whereMonth('date', now()->month)
-                ->whereYear('date', now()->year)
-                ->sum('working_hours');
-
-            $monthlyAttendance = [];
-            for ($month = 1; $month <= now()->month; $month++) {
-                $monthPresent = Attendance::where('employee_id', $employee->id)
-                    ->whereMonth('date', $month)
-                    ->whereYear('date', now()->year)
-                    ->where('status', 'Present')
-                    ->count();
-
-                $monthTotal = Attendance::where('employee_id', $employee->id)
-                    ->whereMonth('date', $month)
-                    ->whereYear('date', now()->year)
-                    ->count();
-
-                $percentage = $monthTotal ? round(($monthPresent / $monthTotal) * 100) : 0;
-
-                $monthlyAttendance[] = [
-                    'month' => date('F', mktime(0, 0, 0, $month, 1)),
-                    'percentage' => $percentage,
-                ];
+            $employeeId = $employee->id;
+        } else {
+            $employee = Employee::first();
+            if (!$employee) {
+                return view('AttendanceLeave.attendance.index', ['employee' => null]);
             }
-
-            // Weekly Summary
-            $weeklySummary = [];
-            for ($i = 0; $i < 6; $i++) {
-                $dayDate = now()->startOfWeek()->addDays($i);
-                $totalEmployees = Employee::count();
-                $presentEmployees = Attendance::whereDate('date', $dayDate)->where('status', 'Present')->count();
-                $percentage = $totalEmployees ? round(($presentEmployees / $totalEmployees) * 100) : 0;
-
-                $weeklySummary[] = [
-                    'day' => $dayDate->format('l'),
-                    'present' => $percentage,
-                ];
-            }
-
-            return view('AttendanceLeave.attendance.index', compact(
-                'employee', 'present', 'late', 'undertime', 'absent', 'rate',
-                'monthlyAttendance', 'monthlyWorkingHours', 'annualLeaves',
-                'weeklyHoliday', 'currentMonthHours', 'weeklySummary'
-            ));
+            $employeeId = $employee->id;
         }
 
-        // Admin / HR: existing functionality
-        $employee = Employee::first();
+        // Company Settings (cached in memory for the request)
+        $settings = CompanySetting::first();
+        $monthlyWorkingHours = $settings->monthly_working_hours ?? 205;
+        $annualLeaves = $settings->annual_leave_days ?? 12;
+        $weeklyHoliday = $settings->weekly_holiday ?? 'Saturday';
 
-        if (!$employee) {
-            return view('AttendanceLeave.attendance.index', [
-                'employee' => null
-            ]);
+        // All attendance counts in ONE query with GROUP BY
+        $counts = Attendance::where('employee_id', $employeeId)
+            ->selectRaw("status, COUNT(*) as count")
+            ->groupBy('status')
+            ->pluck('count', 'status');
+
+        $present = $counts['Present'] ?? 0;
+        $late = $counts['Late'] ?? 0;
+        $undertime = $counts['Undertime'] ?? 0;
+        $absent = $counts['Absent'] ?? 0;
+        $total = $present + $late + $undertime + $absent;
+        $rate = $total ? round(($present / $total) * 100) : 0;
+
+        // Current month working hours - single query
+        $currentMonthHours = Attendance::where('employee_id', $employeeId)
+            ->whereMonth('date', now()->month)
+            ->whereYear('date', now()->year)
+            ->sum('working_hours');
+
+        // Monthly attendance chart - ONE query with GROUP BY month, status
+        $monthlyRaw = Attendance::where('employee_id', $employeeId)
+            ->whereYear('date', now()->year)
+            ->whereMonth('date', '<=', now()->month)
+            ->selectRaw("MONTH(date) as m, status, COUNT(*) as count")
+            ->groupBy('m', 'status')
+            ->get();
+
+        $monthlyGrouped = $monthlyRaw->groupBy('m');
+        $monthlyAttendance = [];
+        for ($month = 1; $month <= now()->month; $month++) {
+            $monthData = $monthlyGrouped->get($month, collect());
+            $monthPresent = $monthData->where('status', 'Present')->sum('count');
+            $monthTotal = $monthData->sum('count');
+            $percentage = $monthTotal ? round(($monthPresent / $monthTotal) * 100) : 0;
+            $monthlyAttendance[] = [
+                'month' => date('F', mktime(0, 0, 0, $month, 1)),
+                'percentage' => $percentage,
+            ];
         }
 
-        // Company Settings
-    $settings = CompanySetting::first();
+        // Weekly summary - ONE query for present counts per day
+        $weekStart = now()->startOfWeek();
+        $weekEnd = $weekStart->copy()->addDays(5);
+        $weeklyRaw = Attendance::whereBetween('date', [$weekStart, $weekEnd])
+            ->where('status', 'Present')
+            ->selectRaw("DATE(date) as d, COUNT(*) as count")
+            ->groupBy('d')
+            ->pluck('count', 'd');
 
-    $monthlyWorkingHours =
-        $settings->monthly_working_hours ?? 205;
+        $totalEmployees = Employee::count();
+        $weeklySummary = [];
+        for ($i = 0; $i < 6; $i++) {
+            $dayDate = $weekStart->copy()->addDays($i);
+            $presentCount = $weeklyRaw->get($dayDate->format('Y-m-d'), 0);
+            $percentage = $totalEmployees ? round(($presentCount / $totalEmployees) * 100) : 0;
+            $weeklySummary[] = [
+                'day' => $dayDate->format('l'),
+                'present' => $percentage,
+            ];
+        }
 
-    $annualLeaves =
-        $settings->annual_leave_days ?? 12;
-
-    $weeklyHoliday =
-        $settings->weekly_holiday ?? 'Saturday';
-
-    // Attendance Counts
-    $present = Attendance::where(
-        'employee_id',
-        $employee->id
-    )
-    ->where('status', 'Present')
-    ->count();
-
-    $late = Attendance::where(
-        'employee_id',
-        $employee->id
-    )
-    ->where('status', 'Late')
-    ->count();
-
-    $undertime = Attendance::where(
-        'employee_id',
-        $employee->id
-    )
-    ->where('status', 'Undertime')
-    ->count();
-
-    $absent = Attendance::where(
-        'employee_id',
-        $employee->id
-    )
-    ->where('status', 'Absent')
-    ->count();
-
-    $total =
-        $present +
-        $late +
-        $undertime +
-        $absent;
-
-    $rate = $total
-        ? round(($present / $total) * 100)
-        : 0;
-
-    // Current Month Working Hours
-    $currentMonthHours =
-        Attendance::where(
-            'employee_id',
-            $employee->id
-        )
-        ->whereMonth(
-            'date',
-            now()->month
-        )
-        ->whereYear(
-            'date',
-            now()->year
-        )
-        ->sum(
-            'working_hours'
-        );
-
-    // Monthly Attendance Chart
-    $monthlyAttendance = [];
-
-    for ($month = 1; $month <= now()->month; $month++) {
-
-        $monthPresent =
-            Attendance::where(
-                'employee_id',
-                $employee->id
-            )
-            ->whereMonth(
-                'date',
-                $month
-            )
-            ->whereYear(
-                'date',
-                now()->year
-            )
-            ->where(
-                'status',
-                'Present'
-            )
-            ->count();
-
-        $monthTotal =
-            Attendance::where(
-                'employee_id',
-                $employee->id
-            )
-            ->whereMonth(
-                'date',
-                $month
-            )
-            ->whereYear(
-                'date',
-                now()->year
-            )
-            ->count();
-
-        $percentage =
-            $monthTotal
-            ? round(
-                ($monthPresent /
-                $monthTotal) * 100
-            )
-            : 0;
-
-        $monthlyAttendance[] = [
-            'month' => date(
-                'F',
-                mktime(
-                    0,
-                    0,
-                    0,
-                    $month,
-                    1
-                )
-            ),
-            'percentage' => $percentage,
-        ];
+        return view('AttendanceLeave.attendance.index', compact(
+            'employee', 'present', 'late', 'undertime', 'absent', 'rate',
+            'monthlyAttendance', 'monthlyWorkingHours', 'annualLeaves',
+            'weeklyHoliday', 'currentMonthHours', 'weeklySummary'
+        ));
     }
-
-    // Weekly Summary
-    $weeklySummary = [];
-
-    for ($i = 0; $i < 6; $i++) {
-
-        $dayDate =
-            now()
-            ->startOfWeek()
-            ->addDays($i);
-
-        $totalEmployees =
-            Employee::count();
-
-        $presentEmployees =
-            Attendance::whereDate(
-                'date',
-                $dayDate
-            )
-            ->where(
-                'status',
-                'Present'
-            )
-            ->count();
-
-        $percentage =
-            $totalEmployees
-            ? round(
-                ($presentEmployees /
-                $totalEmployees) * 100
-            )
-            : 0;
-
-        $weeklySummary[] = [
-
-            'day' =>
-                $dayDate->format('l'),
-
-            'present' =>
-                $percentage,
-        ];
-    }
-
-    return view(
-        'AttendanceLeave.attendance.index',
-        compact(
-            'employee',
-            'present',
-            'late',
-            'undertime',
-            'absent',
-            'rate',
-            'monthlyAttendance',
-            'monthlyWorkingHours',
-            'annualLeaves',
-            'weeklyHoliday',
-            'currentMonthHours',
-            'weeklySummary'
-        )
-    );
-}
 // CREATE PAGE
     public function create()
     {

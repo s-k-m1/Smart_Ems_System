@@ -21,15 +21,15 @@ services:
       - key: DB_CONNECTION
         value: mysql
       - key: DB_HOST
-        value: YOUR_MYSQL_HOST
+        sync: false
       - key: DB_PORT
         value: "3306"
       - key: DB_DATABASE
-        value: smart_ems
+        sync: false
       - key: DB_USERNAME
-        value: YOUR_DB_USER
+        sync: false
       - key: DB_PASSWORD
-        value: YOUR_DB_PASSWORD
+        sync: false
       - key: SESSION_DRIVER
         value: database
       - key: QUEUE_CONNECTION
@@ -45,7 +45,7 @@ services:
       - key: MAIL_USERNAME
         value: skycse001@gmail.com
       - key: MAIL_PASSWORD
-        value: YOUR_GMAIL_APP_PASSWORD
+        sync: false
       - key: MAIL_ENCRYPTION
         value: tls
       - key: MAIL_FROM_ADDRESS

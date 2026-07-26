@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\Auth\LoginController;
@@ -9,18 +10,7 @@ use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 
 // Home / Root
-Route::get('/', function () {
-    if (auth()->check()) {
-        $user = auth()->user();
-        if ($user->isAdmin()) {
-            return redirect('/admin/dashboard');
-        } elseif ($user->isHr()) {
-            return redirect('/hr/dashboard');
-        }
-        return redirect('/employee/dashboard');
-    }
-    return redirect('/login');
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 // Guest routes
 Route::middleware('guest')->group(function () {
@@ -44,9 +34,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-    Route::get('/detail', function () {
-        return view('EmployeDetail.index');
-    })->name('EmployeDetail.index');
+    Route::get('/detail', [HomeController::class, 'detail'])->name('EmployeDetail.index');
 
     // report page - admin only
     Route::get('/report', [ReportController::class, 'index'])
