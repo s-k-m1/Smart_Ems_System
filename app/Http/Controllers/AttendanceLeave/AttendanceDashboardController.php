@@ -69,7 +69,7 @@ class AttendanceDashboardController extends Controller
             ->whereBetween('date', [now()->startOfYear()->format('Y-m-d'), now()->format('Y-m-d')])
             ->get(['date', 'status']);
 
-        $monthlyGrouped = $monthlyRaw->groupBy(fn($r) => (int)$r->date->format('m'));
+        $monthlyGrouped = $monthlyRaw->groupBy(fn($r) => (int)\Carbon\Carbon::parse($r->date)->format('m'));
         $monthlyAttendance = [];
         for ($month = 1; $month <= now()->month; $month++) {
             $monthData = $monthlyGrouped->get($month, collect());
@@ -89,7 +89,7 @@ class AttendanceDashboardController extends Controller
             ->where('status', 'Present')
             ->get(['date', 'employee_id']);
 
-        $weeklyGrouped = $weeklyRecords->groupBy(fn($r) => $r->date->format('Y-m-d'));
+        $weeklyGrouped = $weeklyRecords->groupBy(fn($r) => \Carbon\Carbon::parse($r->date)->format('Y-m-d'));
         $totalEmployees = Employee::count();
         $weeklySummary = [];
         for ($i = 0; $i < 6; $i++) {
