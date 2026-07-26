@@ -23,7 +23,7 @@
                     <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
             </div>
-            <p class="text-2xl sm:text-3xl font-bold text-slate-800">{{ $totalEmployees }}</p>
+            <p id="stat-total-employees" class="text-2xl sm:text-3xl font-bold text-slate-800">{{ $totalEmployees }}</p>
         </div>
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
             <div class="flex items-center justify-between mb-3">
@@ -32,7 +32,7 @@
                     <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
-            <p class="text-2xl sm:text-3xl font-bold text-green-600">{{ $activeEmployees }}</p>
+            <p id="stat-active-employees" class="text-2xl sm:text-3xl font-bold text-green-600">{{ $activeEmployees }}</p>
         </div>
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
             <div class="flex items-center justify-between mb-3">
@@ -41,7 +41,7 @@
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 </div>
             </div>
-            <p class="text-2xl sm:text-3xl font-bold text-blue-600">{{ $todayAttendance }}</p>
+            <p id="stat-today-attendance" class="text-2xl sm:text-3xl font-bold text-blue-600">{{ $todayAttendance }}</p>
         </div>
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
             <div class="flex items-center justify-between mb-3">
@@ -50,7 +50,7 @@
                     <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
-            <p class="text-2xl sm:text-3xl font-bold text-yellow-600">{{ $pendingLeaves }}</p>
+            <p id="stat-pending-leaves" class="text-2xl sm:text-3xl font-bold text-yellow-600">{{ $pendingLeaves }}</p>
         </div>
     </div>
 
@@ -70,29 +70,29 @@
     </div>
 
     {{-- Payroll Summary --}}
-    @if($payrollThisMonth && $payrollThisMonth->total_basic)
+    <div id="payroll-section" @if(!($payrollThisMonth && $payrollThisMonth->total_basic)) style="display:none" @else style="display:block" @endif>
     <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 mb-8">
-        <h3 class="text-base sm:text-lg font-semibold text-slate-800 mb-4">Payroll Summary — {{ now()->format('F Y') }}</h3>
+        <h3 class="text-base sm:text-lg font-semibold text-slate-800 mb-4">Payroll Summary — <span id="payroll-month">{{ now()->format('F Y') }}</span></h3>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div class="bg-slate-50 rounded-xl p-4">
                 <p class="text-sm text-slate-500">Total Basic Salary</p>
-                <p class="text-xl font-bold text-slate-800">Rs. {{ number_format($payrollThisMonth->total_basic, 2) }}</p>
+                <p id="payroll-total-basic" class="text-xl font-bold text-slate-800">Rs. {{ $payrollThisMonth ? number_format($payrollThisMonth->total_basic, 2) : '0.00' }}</p>
             </div>
             <div class="bg-slate-50 rounded-xl p-4">
                 <p class="text-sm text-slate-500">Total Allowances</p>
-                <p class="text-xl font-bold text-green-600">Rs. {{ number_format($payrollThisMonth->total_allowances, 2) }}</p>
+                <p id="payroll-total-allowances" class="text-xl font-bold text-green-600">Rs. {{ $payrollThisMonth ? number_format($payrollThisMonth->total_allowances, 2) : '0.00' }}</p>
             </div>
             <div class="bg-slate-50 rounded-xl p-4">
                 <p class="text-sm text-slate-500">Total Deductions</p>
-                <p class="text-xl font-bold text-red-600">Rs. {{ number_format($payrollThisMonth->total_deductions, 2) }}</p>
+                <p id="payroll-total-deductions" class="text-xl font-bold text-red-600">Rs. {{ $payrollThisMonth ? number_format($payrollThisMonth->total_deductions, 2) : '0.00' }}</p>
             </div>
             <div class="bg-slate-50 rounded-xl p-4">
                 <p class="text-sm text-slate-500">Net Payable</p>
-                <p class="text-xl font-bold text-indigo-600">Rs. {{ number_format($payrollThisMonth->total_net, 2) }}</p>
+                <p id="payroll-total-net" class="text-xl font-bold text-indigo-600">Rs. {{ $payrollThisMonth ? number_format($payrollThisMonth->total_net, 2) : '0.00' }}</p>
             </div>
         </div>
     </div>
-    @endif
+    </div>
 
     {{-- Navigation Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
@@ -170,9 +170,15 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    var COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
+
+    function formatCurrency(n) {
+        return 'Rs. ' + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
     // Attendance Trend Chart
     var ctx1 = document.getElementById('attendanceChart').getContext('2d');
-    new Chart(ctx1, {
+    var attendanceChart = new Chart(ctx1, {
         type: 'bar',
         data: {
             labels: @json($months),
@@ -218,17 +224,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Department Distribution Chart
     var ctx2 = document.getElementById('deptChart').getContext('2d');
-    var deptLabels = @json($deptStats->keys());
-    var deptData = @json($deptStats->values());
-    var colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
-
-    new Chart(ctx2, {
+    var deptChart = new Chart(ctx2, {
         type: 'doughnut',
         data: {
-            labels: deptLabels,
+            labels: [],
             datasets: [{
-                data: deptData,
-                backgroundColor: colors.slice(0, deptLabels.length),
+                data: [],
+                backgroundColor: [],
                 borderWidth: 2,
                 borderColor: '#ffffff'
             }]
@@ -245,6 +247,53 @@ document.addEventListener('DOMContentLoaded', function () {
             cutout: '55%'
         }
     });
+
+    function fetchChartData() {
+        fetch('/admin/dashboard/chart-data')
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                // Update stat cards
+                document.getElementById('stat-total-employees').textContent = data.totalEmployees;
+                document.getElementById('stat-active-employees').textContent = data.activeEmployees;
+                document.getElementById('stat-today-attendance').textContent = data.todayAttendance;
+                document.getElementById('stat-pending-leaves').textContent = data.pendingLeaves;
+
+                // Update attendance chart
+                attendanceChart.data.labels = data.months;
+                attendanceChart.data.datasets[0].data = data.presentData;
+                attendanceChart.data.datasets[1].data = data.lateData;
+                attendanceChart.data.datasets[2].data = data.absentData;
+                attendanceChart.update('none');
+
+                // Update department chart
+                var deptLabels = Object.keys(data.deptStats);
+                var deptValues = Object.values(data.deptStats);
+                deptChart.data.labels = deptLabels;
+                deptChart.data.datasets[0].data = deptValues;
+                deptChart.data.datasets[0].backgroundColor = COLORS.slice(0, deptLabels.length);
+                deptChart.update('none');
+
+                // Update payroll
+                var payrollSection = document.getElementById('payroll-section');
+                if (data.payrollThisMonth && data.payrollThisMonth.total_basic) {
+                    payrollSection.style.display = 'block';
+                    document.getElementById('payroll-month').textContent = data.payrollThisMonth.month || new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
+                    document.getElementById('payroll-total-basic').textContent = formatCurrency(data.payrollThisMonth.total_basic);
+                    document.getElementById('payroll-total-allowances').textContent = formatCurrency(data.payrollThisMonth.total_allowances);
+                    document.getElementById('payroll-total-deductions').textContent = formatCurrency(data.payrollThisMonth.total_deductions);
+                    document.getElementById('payroll-total-net').textContent = formatCurrency(data.payrollThisMonth.total_net);
+                } else {
+                    payrollSection.style.display = 'none';
+                }
+            })
+            .catch(function (err) { console.warn('Dashboard poll error:', err); });
+    }
+
+    // Initial fetch to sync dept chart labels (already done for attendance)
+    fetchChartData();
+
+    // Poll every 30 seconds
+    setInterval(fetchChartData, 30000);
 });
 </script>
 @endpush

@@ -8,6 +8,8 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
         ->name('admin.dashboard')->middleware('role:admin');
+    Route::get('/admin/dashboard/chart-data', [DashboardController::class, 'chartData'])
+        ->name('admin.dashboard.chart-data')->middleware('role:admin');
 
     Route::get('/hr/dashboard', [DashboardController::class, 'hr'])
         ->name('hr.dashboard')->middleware('role:hr');

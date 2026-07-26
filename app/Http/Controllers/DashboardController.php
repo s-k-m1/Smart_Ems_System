@@ -17,6 +17,17 @@ class DashboardController extends Controller
 
     public function admin()
     {
+        $data = $this->buildDashboardData();
+        return view('CoreSystem.dashboard.admin', $data);
+    }
+
+    public function chartData()
+    {
+        return response()->json($this->buildDashboardData());
+    }
+
+    private function buildDashboardData()
+    {
         $totalEmployees = Employee::count();
         $activeEmployees = Employee::where('status', 'Active')->count();
         $todayAttendance = Attendance::whereDate('date', now()->toDateString())->count();
@@ -49,7 +60,6 @@ class DashboardController extends Controller
         // Department distribution
         $deptStats = Employee::selectRaw("department, COUNT(*) as count")
             ->groupBy('department')
-            ->get()
             ->pluck('count', 'department');
 
         // Payroll summary
@@ -57,11 +67,11 @@ class DashboardController extends Controller
             ->selectRaw("SUM(basic_salary) as total_basic, SUM(allowances) as total_allowances, SUM(deductions) as total_deductions, SUM(net_pay) as total_net")
             ->first();
 
-        return view('CoreSystem.dashboard.admin', compact(
+        return compact(
             'totalEmployees', 'activeEmployees', 'todayAttendance', 'pendingLeaves',
             'months', 'presentData', 'absentData', 'lateData',
             'deptStats', 'payrollThisMonth'
-        ));
+        );
     }
 
     public function hr()
