@@ -14,6 +14,11 @@ php artisan route:cache || echo "Route caching skipped — some routes use closu
 echo "=== Storage link ==="
 php artisan storage:link --force || true
 
+echo "=== Creating SQLite database if needed ==="
+if [ "$DB_CONNECTION" = "sqlite" ]; then
+  touch "$DB_DATABASE" 2>/dev/null || touch database/database.sqlite
+fi
+
 echo "=== Running migrations ==="
 php artisan migrate --force
 

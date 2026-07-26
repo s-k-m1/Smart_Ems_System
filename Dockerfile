@@ -26,6 +26,10 @@ RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cac
 # Nginx config
 COPY nginx.conf /etc/nginx/sites-enabled/default
 
+# Startup script
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
 EXPOSE 8080
 
-CMD php-fpm -D && nginx -g "daemon off;"
+CMD ["/start.sh"]
