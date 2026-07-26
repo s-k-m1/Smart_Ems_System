@@ -14,6 +14,7 @@
 </header>
 
 <div class="p-4 sm:p-8">
+    {{-- Stats Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
             <div class="flex items-center justify-between mb-3">
@@ -22,7 +23,7 @@
                     <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
             </div>
-            <p class="text-2xl sm:text-3xl font-bold text-slate-800">{{ \App\Models\Employee::count() }}</p>
+            <p class="text-2xl sm:text-3xl font-bold text-slate-800">{{ $totalEmployees }}</p>
         </div>
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
             <div class="flex items-center justify-between mb-3">
@@ -31,7 +32,7 @@
                     <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
-            <p class="text-2xl sm:text-3xl font-bold text-green-600">{{ \App\Models\Employee::where('status', 'Active')->count() }}</p>
+            <p class="text-2xl sm:text-3xl font-bold text-green-600">{{ $activeEmployees }}</p>
         </div>
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
             <div class="flex items-center justify-between mb-3">
@@ -40,7 +41,7 @@
                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
                 </div>
             </div>
-            <p class="text-2xl sm:text-3xl font-bold text-blue-600">{{ \App\Models\Attendance::whereDate('date', now()->toDateString())->count() }}</p>
+            <p class="text-2xl sm:text-3xl font-bold text-blue-600">{{ $todayAttendance }}</p>
         </div>
         <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
             <div class="flex items-center justify-between mb-3">
@@ -49,10 +50,51 @@
                     <svg class="w-5 h-5 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
             </div>
-            <p class="text-2xl sm:text-3xl font-bold text-yellow-600">{{ \App\Models\Leave::where('status', 'Pending')->count() }}</p>
+            <p class="text-2xl sm:text-3xl font-bold text-yellow-600">{{ $pendingLeaves }}</p>
         </div>
     </div>
 
+    {{-- Charts Row --}}
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-8">
+        {{-- Monthly Attendance Trend --}}
+        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
+            <h3 class="text-base sm:text-lg font-semibold text-slate-800 mb-4">Monthly Attendance Trend</h3>
+            <canvas id="attendanceChart" height="200"></canvas>
+        </div>
+
+        {{-- Department Distribution --}}
+        <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
+            <h3 class="text-base sm:text-lg font-semibold text-slate-800 mb-4">Department Distribution</h3>
+            <canvas id="deptChart" height="200"></canvas>
+        </div>
+    </div>
+
+    {{-- Payroll Summary --}}
+    @if($payrollThisMonth && $payrollThisMonth->total_basic)
+    <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 mb-8">
+        <h3 class="text-base sm:text-lg font-semibold text-slate-800 mb-4">Payroll Summary — {{ now()->format('F Y') }}</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="bg-slate-50 rounded-xl p-4">
+                <p class="text-sm text-slate-500">Total Basic Salary</p>
+                <p class="text-xl font-bold text-slate-800">Rs. {{ number_format($payrollThisMonth->total_basic, 2) }}</p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4">
+                <p class="text-sm text-slate-500">Total Allowances</p>
+                <p class="text-xl font-bold text-green-600">Rs. {{ number_format($payrollThisMonth->total_allowances, 2) }}</p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4">
+                <p class="text-sm text-slate-500">Total Deductions</p>
+                <p class="text-xl font-bold text-red-600">Rs. {{ number_format($payrollThisMonth->total_deductions, 2) }}</p>
+            </div>
+            <div class="bg-slate-50 rounded-xl p-4">
+                <p class="text-sm text-slate-500">Net Payable</p>
+                <p class="text-xl font-bold text-indigo-600">Rs. {{ number_format($payrollThisMonth->total_net, 2) }}</p>
+            </div>
+        </div>
+    </div>
+    @endif
+
+    {{-- Navigation Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         <a href="/employees" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-indigo-200 transition group">
             <div class="flex items-center gap-4">
@@ -123,3 +165,86 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Attendance Trend Chart
+    var ctx1 = document.getElementById('attendanceChart').getContext('2d');
+    new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: @json($months),
+            datasets: [
+                {
+                    label: 'Present',
+                    data: @json($presentData),
+                    backgroundColor: 'rgba(34, 197, 94, 0.7)',
+                    borderColor: 'rgb(34, 197, 94)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Late',
+                    data: @json($lateData),
+                    backgroundColor: 'rgba(234, 179, 8, 0.7)',
+                    borderColor: 'rgb(234, 179, 8)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Absent',
+                    data: @json($absentData),
+                    backgroundColor: 'rgba(239, 68, 68, 0.7)',
+                    borderColor: 'rgb(239, 68, 68)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                x: { stacked: true, grid: { display: false } },
+                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 10 } }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { usePointStyle: true, padding: 16 }
+                }
+            }
+        }
+    });
+
+    // Department Distribution Chart
+    var ctx2 = document.getElementById('deptChart').getContext('2d');
+    var deptLabels = @json($deptStats->keys());
+    var deptData = @json($deptStats->values());
+    var colors = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
+
+    new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            labels: deptLabels,
+            datasets: [{
+                data: deptData,
+                backgroundColor: colors.slice(0, deptLabels.length),
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { usePointStyle: true, padding: 12, boxWidth: 12 }
+                }
+            },
+            cutout: '55%'
+        }
+    });
+});
+</script>
+@endpush
