@@ -36,17 +36,19 @@ class DashboardController extends Controller
             $records = Attendance::whereRaw("strftime('%Y-%m', date) = ?", [$month])
                 ->selectRaw("status, COUNT(*) as count")
                 ->groupBy('status')
+                ->get()
                 ->pluck('count', 'status');
 
             $months[] = $label;
-            $presentData[] = $records['Present'] ?? 0;
-            $absentData[] = $records['Absent'] ?? 0;
-            $lateData[] = $records['Late'] ?? 0;
+            $presentData[] = (int) ($records['Present'] ?? 0);
+            $absentData[] = (int) ($records['Absent'] ?? 0);
+            $lateData[] = (int) ($records['Late'] ?? 0);
         }
 
         // Department distribution
         $deptStats = Employee::selectRaw("department, COUNT(*) as count")
             ->groupBy('department')
+            ->get()
             ->pluck('count', 'department');
 
         // Payroll summary

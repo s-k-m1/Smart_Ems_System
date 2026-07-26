@@ -49,6 +49,7 @@ class AttendanceDashboardController extends Controller
         $counts = Attendance::where('employee_id', $selectedEmployeeId)
             ->selectRaw("status, COUNT(*) as count")
             ->groupBy('status')
+            ->get()
             ->pluck('count', 'status');
 
         $present = $counts['Present'] ?? 0;
