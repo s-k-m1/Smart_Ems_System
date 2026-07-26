@@ -18,7 +18,6 @@ COPY . .
 
 # Install dependencies and optimize
 RUN composer install --no-dev --optimize-autoloader --no-interaction --no-cache
-RUN php artisan config:cache || true
 RUN php artisan view:cache || true
 RUN php artisan storage:link --force || true
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
