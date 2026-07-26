@@ -69,6 +69,12 @@
         </div>
     </div>
 
+    {{-- Working Hours Chart --}}
+    <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 mb-8">
+        <h3 class="text-base sm:text-lg font-semibold text-slate-800 mb-4">Total Working Hours per Month</h3>
+        <canvas id="hoursChart" height="120"></canvas>
+    </div>
+
     {{-- Payroll Summary --}}
     <div id="payroll-section" @if(!($payrollThisMonth && $payrollThisMonth->total_basic)) style="display:none" @else style="display:block" @endif>
     <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 mb-8">
@@ -222,6 +228,37 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
+    // Working Hours Chart
+    var ctx3 = document.getElementById('hoursChart').getContext('2d');
+    var hoursChart = new Chart(ctx3, {
+        type: 'line',
+        data: {
+            labels: @json($months),
+            datasets: [{
+                label: 'Total Hours',
+                data: @json($workingHoursData),
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                borderColor: '#6366f1',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.3,
+                pointBackgroundColor: '#6366f1',
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                x: { grid: { display: false } },
+                y: { beginAtZero: true, ticks: { callback: function(v) { return v + 'h'; } } }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+
     // Department Distribution Chart
     var ctx2 = document.getElementById('deptChart').getContext('2d');
     var deptChart = new Chart(ctx2, {
@@ -272,6 +309,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 deptChart.data.datasets[0].data = deptValues;
                 deptChart.data.datasets[0].backgroundColor = COLORS.slice(0, deptLabels.length);
                 deptChart.update('none');
+
+                // Update working hours chart
+                hoursChart.data.labels = data.months;
+                hoursChart.data.datasets[0].data = data.workingHoursData;
+                hoursChart.update('none');
 
                 // Update payroll
                 var payrollSection = document.getElementById('payroll-section');
