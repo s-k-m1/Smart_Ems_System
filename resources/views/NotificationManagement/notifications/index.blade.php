@@ -19,7 +19,7 @@
 
 @section('content')
 
-    <div class="px-6 py-6">
+    <div class="px-4 sm:px-6 py-4 sm:py-6">
 
         {{-- Tabs --}}
         @include('NotificationManagement.notifications.tabs')

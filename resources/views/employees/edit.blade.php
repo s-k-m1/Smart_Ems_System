@@ -5,7 +5,7 @@
 @section('content')
 
 <header class="bg-white border-b border-slate-200">
-    <div class="px-8 py-6">
+    <div class="px-4 sm:px-8 py-4 sm:py-6">
         <h1 class="text-2xl font-semibold text-slate-800">Edit Employee</h1>
         <p class="text-sm text-slate-500 mt-1">Update {{ $employee->name }}'s details</p>
     </div>

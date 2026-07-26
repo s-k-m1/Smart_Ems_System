@@ -5,19 +5,19 @@
 @section('content')
 
 <header class="bg-white border-b border-slate-200">
-    <div class="px-8 py-6 flex items-center justify-between">
+    <div class="px-4 sm:px-8 py-4 sm:py-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-            <h1 class="text-2xl font-semibold text-slate-800">Employee Management</h1>
+            <h1 class="text-xl sm:text-2xl font-semibold text-slate-800">Employee Management</h1>
             <p class="text-sm text-slate-500 mt-1">View and manage all employees in your organization</p>
         </div>
         <a href="{{ route('employees.create') }}"
-           class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-sm font-medium">
+           class="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors text-sm font-medium text-center">
             + Add Employee
         </a>
     </div>
 </header>
 
-<main class="px-8 py-8">
+<main class="px-4 sm:px-8 py-4 sm:py-8">
 
         @if (session('success'))
             <div class="mb-6 px-4 py-3 rounded-lg bg-green-100 text-green-700 text-sm">

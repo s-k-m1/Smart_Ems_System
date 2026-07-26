@@ -3,7 +3,7 @@
 @section('title', 'Create Payroll')
 
 @section('content')
-<div class="px-8 py-8 max-w-3xl">
+<div class="px-4 sm:px-8 py-4 sm:py-8 max-w-3xl">
 
     <div class="mb-6">
         <h1 class="text-2xl font-bold text-slate-800">Create Payroll</h1>

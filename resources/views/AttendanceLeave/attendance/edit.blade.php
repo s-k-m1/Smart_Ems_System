@@ -4,7 +4,7 @@
 
 @section('content')
 
-    <div class="px-8 py-8"
+    <div class="px-4 sm:px-8 py-4 sm:py-8"
     >
 
         <div

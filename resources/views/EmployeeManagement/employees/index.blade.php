@@ -3,7 +3,7 @@
 @section('title', 'Employees')
 
 @section('content')
-<div class="p-8">
-    <h1 class="text-2xl font-bold text-slate-800">Employee Working</h1>
+<div class="p-4 sm:p-8">
+    <h1 class="text-xl sm:text-2xl font-bold text-slate-800">Employee Working</h1>
 </div>
 @endsection

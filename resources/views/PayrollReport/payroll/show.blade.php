@@ -3,7 +3,7 @@
 @section('title', 'Payroll - ' . $payroll->employee->name)
 
 @section('content')
-<div class="px-8 py-8 max-w-3xl">
+<div class="px-4 sm:px-8 py-4 sm:py-8 max-w-3xl">
 
     <div class="mb-6 flex items-center justify-between">
         <div>

@@ -4,7 +4,7 @@
 
 @section('content')
 
-        <div class="px-8 py-8">
+        <div class="px-4 sm:px-8 py-4 sm:py-8">
 
             <h1 class="text-2xl font-bold mb-1">Reports</h1>
             <p class="text-gray-500 mb-4">Attendance, payroll, and employee distribution overview</p>
