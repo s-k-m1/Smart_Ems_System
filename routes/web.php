@@ -8,6 +8,11 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 
+// Debug route (no middleware)
+Route::post('/debug-test', function () {
+    return response('OK: ' . date('H:i:s'), 200);
+});
+
 // Home / Root
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
