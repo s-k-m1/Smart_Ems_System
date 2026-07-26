@@ -135,45 +135,13 @@
 
                     </div>
 
-                    {{-- Status --}}
+                    {{-- Auto Status Info --}}
                     <div>
 
-                        <label
-                            class="
-                                block
-                                mb-2
-                                text-gray-500
-                                font-semibold
-                                text-sm
-                                sm:text-base
-                            "
-                        >
-                            Attendance Status
-                        </label>
-
-                        <select
-                            name="status"
-                            required
-                            class="
-                                w-full
-                                rounded-3xl
-                                border
-                                border-gray-200
-                                bg-gray-50
-                                px-6
-                                py-5
-                                focus:ring-4
-                                focus:ring-green-100
-                                outline-none
-                            "
-                        >
-
-                            <option>Present</option>
-                            <option>Late</option>
-                            <option>Undertime</option>
-                            <option>Absent</option>
-
-                        </select>
+                        <div class="bg-blue-50 rounded-3xl px-6 py-5 border border-blue-100">
+                            <p class="text-sm text-blue-700 font-medium">Status Auto-Detected</p>
+                            <p class="text-xs text-blue-500 mt-1">Status is determined automatically from check-in/check-out times. Absent if no check-in, Undertime if &lt;7h or incomplete, Late if after 9:00 AM, Present otherwise.</p>
+                        </div>
 
                     </div>
 

@@ -133,63 +133,13 @@
 
                     </div>
 
-                    {{-- Status --}}
+                    {{-- Auto Status Info --}}
                     <div>
 
-                        <label
-                            class="
-                                text-gray-500
-                                block
-                                mb-3
-                                font-semibold
-                            "
-                        >
-                            Attendance Status
-                        </label>
-
-                        <select
-                            name="status"
-                            required
-                            class="
-                                w-full
-                                rounded-[24px]
-                                border
-                                border-gray-200
-                                bg-slate-50
-                                px-6
-                                py-5
-                            "
-                        >
-
-                            <option
-                                value="Present"
-                                {{ $attendance->status == 'Present' ? 'selected' : '' }}
-                            >
-                                Present
-                            </option>
-
-                            <option
-                                value="Late"
-                                {{ $attendance->status == 'Late' ? 'selected' : '' }}
-                            >
-                                Late
-                            </option>
-
-                            <option
-                                value="Undertime"
-                                {{ $attendance->status == 'Undertime' ? 'selected' : '' }}
-                            >
-                                Undertime
-                            </option>
-
-                            <option
-                                value="Absent"
-                                {{ $attendance->status == 'Absent' ? 'selected' : '' }}
-                            >
-                                Absent
-                            </option>
-
-                        </select>
+                        <div class="bg-indigo-50 rounded-[24px] px-6 py-5 border border-indigo-100">
+                            <p class="text-sm text-indigo-700 font-medium">Status Auto-Detected</p>
+                            <p class="text-xs text-indigo-500 mt-1">Current: <strong>{{ $attendance->status }}</strong>. Will be recalculated from check-in/check-out on save.</p>
+                        </div>
 
                     </div>
 

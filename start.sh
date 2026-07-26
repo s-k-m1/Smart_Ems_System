@@ -3,6 +3,8 @@ set -e
 
 echo "=== Fixing permissions ==="
 chmod -R 777 storage database bootstrap/cache 2>/dev/null || true
+touch storage/logs/laravel.log 2>/dev/null || true
+chmod 666 storage/logs/laravel.log 2>/dev/null || true
 
 echo "=== Caching config ==="
 php artisan config:cache || echo "Config cache skipped"

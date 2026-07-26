@@ -8,6 +8,11 @@ class Attendance extends Model
 {
     protected $table = 'attendances';
 
+    protected $casts = [
+        'date' => 'date',
+        'check_in' => 'string',
+        'check_out' => 'string',
+    ];
 
     protected $fillable = [
 

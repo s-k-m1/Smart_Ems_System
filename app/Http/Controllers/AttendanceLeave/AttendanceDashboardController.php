@@ -115,12 +115,29 @@ class AttendanceDashboardController extends Controller
         return view('AttendanceLeave.attendance.create', compact('employees'));
     }
 
+    private function detectStatus($checkIn, $checkOut, $workingHours)
+    {
+        if (!$checkIn) {
+            return 'Absent';
+        }
+        if (!$checkOut) {
+            return 'Undertime';
+        }
+        if ($workingHours < 7) {
+            return 'Undertime';
+        }
+        $cutoff = strtotime('09:00');
+        if (strtotime($checkIn) > $cutoff) {
+            return 'Late';
+        }
+        return 'Present';
+    }
+
     // STORE
     public function store(Request $request)
 {
     $request->validate([
         'employee_id' => 'required|exists:employees,id',
-        'status' => 'required|in:Present,Late,Undertime,Absent',
         'date' => 'required|date',
         'check_in' => 'nullable',
         'check_out' => 'nullable',
@@ -142,16 +159,18 @@ class AttendanceDashboardController extends Controller
         $workingHours = round(($checkOut - $checkIn) / 3600, 2);
     }
 
+    $status = $this->detectStatus($request->check_in, $request->check_out, $workingHours);
+
     Attendance::create([
         'employee_id' => $request->employee_id,
-        'status' => $request->status,
+        'status' => $status,
         'date' => $request->date,
         'check_in' => $request->check_in,
         'check_out' => $request->check_out,
         'working_hours' => $workingHours,
     ]);
 
-    return redirect('/attendance?employee=' . $request->employee_id)->with('success', 'Attendance recorded successfully.');
+    return redirect('/attendance?employee=' . $request->employee_id)->with('success', "Attendance recorded as {$status}.");
 }
 
     // EDIT PAGE
@@ -170,7 +189,6 @@ class AttendanceDashboardController extends Controller
 
     $request->validate([
         'employee_id' => 'required|exists:employees,id',
-        'status' => 'required|in:Present,Late,Undertime,Absent',
         'date' => 'required|date',
         'check_in' => 'nullable',
         'check_out' => 'nullable',
@@ -183,16 +201,18 @@ class AttendanceDashboardController extends Controller
         $workingHours = round(($checkOut - $checkIn) / 3600, 2);
     }
 
+    $status = $this->detectStatus($request->check_in, $request->check_out, $workingHours);
+
     $attendance->update([
         'employee_id' => $request->employee_id,
-        'status' => $request->status,
+        'status' => $status,
         'date' => $request->date,
         'check_in' => $request->check_in,
         'check_out' => $request->check_out,
         'working_hours' => $workingHours,
     ]);
 
-    return redirect('/attendance?employee=' . $request->employee_id)->with('success', 'Attendance updated successfully.');
+    return redirect('/attendance?employee=' . $request->employee_id)->with('success', "Attendance updated as {$status}.");
 }
 
     // DELETE

@@ -33,17 +33,19 @@ class DashboardController extends Controller
         $todayAttendance = Attendance::whereDate('date', now()->toDateString())->count();
         $pendingLeaves = Leave::where('status', 'Pending')->count();
 
-        // Monthly attendance trend (last 6 months)
+        // Monthly attendance trend + working hours (last 6 months)
         $months = [];
         $presentData = [];
         $absentData = [];
         $lateData = [];
+        $workingHoursData = [];
 
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
             $label = $date->format('M');
             $monthStart = $date->startOfMonth()->format('Y-m-d');
             $monthEnd = $date->copy()->endOfMonth()->format('Y-m-d');
+            $monthEndFormatted = $date->format('Y-m');
 
             $records = Attendance::whereBetween('date', [$monthStart, $monthEnd])
                 ->selectRaw("status, COUNT(*) as count")
@@ -51,10 +53,14 @@ class DashboardController extends Controller
                 ->get()
                 ->pluck('count', 'status');
 
+            $monthHours = Attendance::whereBetween('date', [$monthStart, $monthEnd])
+                ->sum('working_hours');
+
             $months[] = $label;
             $presentData[] = (int) ($records['Present'] ?? 0);
             $absentData[] = (int) ($records['Absent'] ?? 0);
             $lateData[] = (int) ($records['Late'] ?? 0);
+            $workingHoursData[] = round($monthHours, 1);
         }
 
         // Department distribution
@@ -69,7 +75,7 @@ class DashboardController extends Controller
 
         return compact(
             'totalEmployees', 'activeEmployees', 'todayAttendance', 'pendingLeaves',
-            'months', 'presentData', 'absentData', 'lateData',
+            'months', 'presentData', 'absentData', 'lateData', 'workingHoursData',
             'deptStats', 'payrollThisMonth'
         );
     }
