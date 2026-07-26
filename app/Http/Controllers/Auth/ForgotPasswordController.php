@@ -27,13 +27,15 @@ class ForgotPasswordController extends Controller
 
         $token = Password::createToken($user);
 
-        app()->terminating(function () use ($user, $token) {
-            try {
-                $user->notify(new PasswordReset($token));
-            } catch (\Throwable $e) {
-                \Log::error('Password reset email failed: ' . $e->getMessage());
-            }
-        });
+        \Illuminate\Support\Facades\Log::info('Starting email send for: ' . $user->email);
+
+        try {
+            set_time_limit(5);
+            $sent = $user->notify(new PasswordReset($token));
+            \Illuminate\Support\Facades\Log::info('Email sent successfully');
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Email failed: ' . get_class($e) . ': ' . $e->getMessage());
+        }
 
         return back()->with(['status' => 'We have emailed your password reset link!']);
     }
