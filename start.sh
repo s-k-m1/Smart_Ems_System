@@ -4,11 +4,8 @@ set -e
 echo "=== Fixing permissions ==="
 chmod -R 777 storage database bootstrap/cache 2>/dev/null || true
 
-echo "=== Setting queue to database ==="
-export QUEUE_CONNECTION=database
-
-echo "=== Caching config ==="
-php artisan config:cache || echo "Config cache skipped"
+echo "=== Clearing stale config cache ==="
+php artisan config:clear || true
 
 echo "=== Setting up database if SQLite ==="
 if [ "$DB_CONNECTION" = "sqlite" ]; then
