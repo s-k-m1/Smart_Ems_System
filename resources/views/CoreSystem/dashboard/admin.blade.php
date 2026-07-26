@@ -302,6 +302,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Fetch immediately when window regains focus
     window.addEventListener('focus', fetchChartData);
+
+    // Cross-tab sync: when attendance is saved in another tab,
+    // the attendance page sets localStorage 'attendance_updated'
+    window.addEventListener('storage', function (e) {
+        if (e.key === 'attendance_updated') fetchChartData();
+    });
 });
 </script>
 @endpush

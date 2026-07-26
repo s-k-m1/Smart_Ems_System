@@ -396,3 +396,9 @@
     </div>
 
 @endsection
+
+@push('scripts')
+@if(session('success') || session('error'))
+<script>localStorage.setItem('attendance_updated', Date.now());</script>
+@endif
+@endpush
