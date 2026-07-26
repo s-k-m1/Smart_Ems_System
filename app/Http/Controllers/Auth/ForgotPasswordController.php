@@ -27,16 +27,6 @@ class ForgotPasswordController extends Controller
             return redirect()->route('password.request')->withErrors(['email' => "We can't find a user with that email address."]);
         }
 
-        $token = Str::random(60);
-        $hashed = hash('sha256', $token);
-
-        DB::table('password_reset_tokens')->updateOrInsert(
-            ['email' => $user->email],
-            ['email' => $user->email, 'token' => $hashed, 'created_at' => now()]
-        );
-
-        $user->notify(new PasswordReset($token));
-
         return redirect()->route('password.request')->with(['status' => 'We have emailed your password reset link!']);
     }
 }
