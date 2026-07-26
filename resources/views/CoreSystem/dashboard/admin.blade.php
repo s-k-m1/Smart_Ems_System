@@ -292,8 +292,16 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial fetch to sync dept chart labels (already done for attendance)
     fetchChartData();
 
-    // Poll every 30 seconds
-    setInterval(fetchChartData, 30000);
+    // Poll every 15 seconds for background sync
+    setInterval(fetchChartData, 15000);
+
+    // Fetch immediately when tab becomes visible (user returns from adding attendance)
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) fetchChartData();
+    });
+
+    // Fetch immediately when window regains focus
+    window.addEventListener('focus', fetchChartData);
 });
 </script>
 @endpush
