@@ -21,12 +21,15 @@ class ForgotPasswordController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return back()->withErrors(['email' => 'We can\'t find a user with that email address.']);
+            return back()->withErrors(['email' => "We can't find a user with that email address."]);
         }
 
         $token = Password::createToken($user);
 
         app()->terminating(function () use ($user, $token) {
+            if (function_exists('fastcgi_finish_request')) {
+                fastcgi_finish_request();
+            }
             $user->sendPasswordResetNotification($token);
         });
 
