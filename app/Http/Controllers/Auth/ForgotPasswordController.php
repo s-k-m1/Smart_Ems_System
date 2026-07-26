@@ -28,9 +28,9 @@ class ForgotPasswordController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (!$user) {
-            return redirect()->route('password.request')->withErrors(['email' => "We can't find a user with that email address."]);
+            return response('USER NOT FOUND', 200);
         }
 
-        return redirect()->route('password.request')->with(['status' => 'We have emailed your password reset link!']);
+        return response('USER FOUND: ' . $user->name . ' | Email: ' . $user->email, 200);
     }
 }
