@@ -4,8 +4,11 @@ set -e
 echo "=== Fixing permissions ==="
 chmod -R 777 storage database bootstrap/cache 2>/dev/null || true
 
-echo "=== Clearing stale config cache ==="
+echo "=== Clearing all stale caches ==="
 php artisan config:clear || true
+php artisan route:clear || true
+php artisan view:clear || true
+php artisan cache:clear || true
 
 echo "=== Setting up database if SQLite ==="
 if [ "$DB_CONNECTION" = "sqlite" ]; then
