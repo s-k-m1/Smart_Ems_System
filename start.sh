@@ -19,6 +19,11 @@ php artisan migrate --force || echo "Migrations failed — continuing"
 echo "=== Seeding admin user ==="
 php artisan db:seed --class=AdminSeeder --force || echo "Admin seeder skipped"
 
+echo "=== Starting queue worker ==="
+export QUEUE_CONNECTION=database
+php artisan queue:work --tries=3 --timeout=90 --sleep=3 -q &
+echo "Queue worker started"
+
 echo "=== Starting PHP-FPM & Nginx ==="
 php-fpm -D
 nginx -g "daemon off;"
