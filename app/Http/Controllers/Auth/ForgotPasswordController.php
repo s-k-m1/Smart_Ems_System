@@ -25,13 +25,15 @@ class ForgotPasswordController extends Controller
             return back()->withErrors(['email' => "We can't find a user with that email address."]);
         }
 
-        try {
-            $token = Password::createToken($user);
-            $user->notify(new PasswordReset($token));
-        } catch (\Throwable $e) {
-            \Log::error('Password reset email failed: ' . $e->getMessage());
-            return back()->withErrors(['email' => 'Could not send reset link. Please try again later.']);
-        }
+        $token = Password::createToken($user);
+
+        app()->terminating(function () use ($user, $token) {
+            try {
+                $user->notify(new PasswordReset($token));
+            } catch (\Throwable $e) {
+                \Log::error('Password reset email failed: ' . $e->getMessage());
+            }
+        });
 
         return back()->with(['status' => 'We have emailed your password reset link!']);
     }
