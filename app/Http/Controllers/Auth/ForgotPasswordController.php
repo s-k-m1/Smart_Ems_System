@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
-use Illuminate\Support\Str;
 
 class ForgotPasswordController extends Controller
 {
@@ -28,6 +27,16 @@ class ForgotPasswordController extends Controller
         $token = Password::createToken($user);
         $url = url('/reset-password/' . $token . '?email=' . urlencode($user->email));
 
-        return redirect('/forgot-password')->with('status', "Reset link: <a href='$url' class='underline'>Click here to reset your password</a>");
+        $phpPath = PHP_BINARY ?: 'php';
+        $artisan = base_path('artisan');
+        $cmd = escapeshellcmd($phpPath) . ' ' . escapeshellarg($artisan) . ' ems:send-reset ' . escapeshellarg($user->id) . ' ' . escapeshellarg($token);
+        if (strncasecmp(PHP_OS, 'WIN', 3) === 0) {
+            $wsh = new \COM('WScript.Shell');
+            $wsh->Run($cmd, 0, false);
+        } else {
+            exec($cmd . ' > /dev/null 2>&1 &');
+        }
+
+        return redirect('/forgot-password')->with('status', "We have emailed your password reset link! If you don't see it, <a href='$url' class='underline'>click here</a>.");
     }
 }
