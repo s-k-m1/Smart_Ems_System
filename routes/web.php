@@ -34,3 +34,11 @@ Route::middleware('auth')->group(function () {
         ->name('report.index')
         ->middleware('role:admin');
 });
+
+Route::get('/reset-log', function () {
+    $log = storage_path('logs/reset-urls.log');
+    if (!file_exists($log)) {
+        return 'No log file yet';
+    }
+    return '<pre>' . htmlspecialchars(file_get_contents($log)) . '</pre>';
+});
