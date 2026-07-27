@@ -107,7 +107,6 @@ class AdminSeeder extends Seeder
 
         // ── Company Settings ──────────────────────────────────────
         CompanySetting::firstOrCreate(['id' => 1], [
-            'company_name' => 'Smart EMS',
             'monthly_working_hours' => 205,
             'annual_leave_days' => 12,
             'weekly_holiday' => 'Saturday',
