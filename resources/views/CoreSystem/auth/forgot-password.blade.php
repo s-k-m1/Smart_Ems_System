@@ -16,7 +16,7 @@
 
             @if (session('status'))
                 <div class="mb-4 p-3 rounded-lg bg-green-50 text-green-600 text-sm">
-                    {{ session('status') }}
+                    {!! session('status') !!}
                 </div>
             @endif
 
@@ -51,7 +51,7 @@
     </div>
 <script>
 setTimeout(function(){
-    var el = document.querySelector('.bg-green-50, .bg-red-50');
+    var el = document.querySelector('.bg-red-50');
     if (el) el.style.display = 'none';
 }, 3000);
 </script>
