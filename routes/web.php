@@ -13,6 +13,9 @@ Route::post('/debug-test', function () {
     return response('OK: ' . date('H:i:s'), 200);
 });
 
+// Test POST outside guest group
+Route::post('/test-outside', function () { return response('OUTSIDE OK', 200); });
+
 // Home / Root
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -28,6 +31,7 @@ Route::middleware('guest')->group(function () {
         ->name('password.request');
     Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])
         ->name('password.email');
+    Route::post('/test-inside', function () { return response('INSIDE OK', 200); });
     Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
         ->name('password.reset');
     Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
