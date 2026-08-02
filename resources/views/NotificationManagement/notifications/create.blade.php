@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Notification</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100">
+
+<div class="max-w-5xl mx-auto mt-10 mb-10">
+
+    <div class="bg-white rounded-2xl shadow-lg">
+
+        <!-- Header -->
+        <div class="border-b px-8 py-6">
+
+            <h1 class="text-3xl font-bold text-slate-800">
+                Create Notification
+            </h1>
+
+            <p class="text-gray-500 mt-2">
+                Publish a new notice for employees.
+            </p>
+
+        </div>
+
+        <form action="{{ route('notifications.store') }}"
+              method="POST"
+              enctype="multipart/form-data">
+
+            @csrf
+
+            <div class="p-8 grid grid-cols-2 gap-6">
+
+                <!-- Title -->
+                <div class="col-span-2">
+                    <label class="block font-semibold mb-2">
+                        Title
+                    </label>
+
+                    <input
+                        type="text"
+                        name="title"
+                        value="{{ old('title') }}"
+                        class="w-full border rounded-lg p-3"
+                        placeholder="Annual Leave Policy Update">
+
+                    @if(session('success'))
+                        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                        {{ session('success') }}
+                </div>
+                    @endif
+                </div>
+
+                <!-- Description -->
+                <div class="col-span-2">
+
+                    <label class="block font-semibold mb-2">
+                        Description
+                    </label>
+
+                    <textarea
+                        name="description"
+                        rows="6"
+                        class="w-full border rounded-lg p-3"
+                        placeholder="Enter notification description...">{{ old('description') }}</textarea>
+
+                </div>
+
+                <!-- Category -->
+                <div>
+
+                    <label class="block font-semibold mb-2">
+                        Category
+                    </label>
+
+                    <select
+                        name="category"
+                        class="w-full border rounded-lg p-3">
+
+                        <option value="Company">Company</option>
+                        <option value="HR">HR</option>
+                        <option value="Payroll">Payroll</option>
+                        <option value="Policies">Policies</option>
+                        <option value="Training">Training</option>
+                        <option value="Events">Events</option>
+
+                    </select>
+
+                </div>
+
+                <!-- Department -->
+                <div>
+
+                    <label class="block font-semibold mb-2">
+                        Department
+                    </label>
+
+                    <input
+                        type="text"
+                        name="department"
+                        value="{{ old('department') }}"
+                        class="w-full border rounded-lg p-3"
+                        placeholder="Human Resource Department">
+
+                </div>
+
+                <!-- Priority -->
+                <div>
+
+                    <label class="block font-semibold mb-2">
+                        Priority
+                    </label>
+
+                    <select
+                        name="priority"
+                        class="w-full border rounded-lg p-3">
+
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="High">High</option>
+
+                    </select>
+
+                </div>
+
+                <!-- Published By -->
+                <div>
+
+                    <label class="block font-semibold mb-2">
+                        Published By
+                    </label>
+
+                    <input
+                        type="text"
+                        name="published_by"
+                        value="{{ old('published_by') }}"
+                        class="w-full border rounded-lg p-3"
+                        placeholder="HR Manager">
+
+                </div>
+
+                <!-- Publish Date -->
+                <div>
+
+                    <label class="block font-semibold mb-2">
+                        Publish Date
+                    </label>
+
+                    <input
+                        type="datetime-local"
+                        name="publish_date"
+                        class="w-full border rounded-lg p-3">
+
+                </div>
+
+                <!-- Attachment -->
+                <div>
+
+                    <label class="block font-semibold mb-2">
+                        Attachment
+                    </label>
+
+                    <input
+                        type="file"
+                        name="attachment"
+                        class="w-full border rounded-lg p-3">
+
+                </div>
+
+                <!-- Pin Notification -->
+                <div class="col-span-2">
+
+                    <label class="inline-flex items-center">
+
+                        <input
+                            type="checkbox"
+                            name="is_pinned"
+                            value="1"
+                            class="w-5 h-5 rounded">
+
+                        <span class="ml-3 font-medium">
+                            Pin this Notification
+                        </span>
+
+                    </label>
+
+                </div>
+
+            </div>
+
+            <!-- Buttons -->
+            <div class="border-t px-8 py-6 flex justify-end gap-4">
+
+                <a href="{{ route('notifications.index') }}"
+                   class="px-6 py-3 rounded-lg bg-gray-200 hover:bg-gray-300">
+
+                    Cancel
+
+                </a>
+
+                <button
+                    type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold">
+
+                    Publish Notification
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+</html>
