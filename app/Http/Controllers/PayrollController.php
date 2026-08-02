@@ -32,7 +32,17 @@ class PayrollController extends Controller
     public function index()
     {
         $payrolls = Payroll::with('employee')->latest()->get();
-        return view('PayrollReport.payroll.index',compact('payrolls'));
+        $totalEmployees = Employee::count();
+        $totalPayrolls =Payroll::count();
+        $paidPayrolls= Payroll::where('status','Paid')->count();
+        $pendingPayrolls= Payroll::where('status','Pending')->count();
+        return view('PayrollReport.payroll.index',compact(
+            'payrolls',
+            'totalEmployees',
+            'totalPayrolls',
+            'paidPayrolls',
+            'pendingPayrolls'
+            ));
     }
     public function markAsPaid($id)
     {
@@ -40,5 +50,36 @@ class PayrollController extends Controller
         $payroll->status ="Paid";
         $payroll->save();
         return redirect('/payroll')->with('success', 'Payroll marked as Paid.');
+    }
+    public function destroy($id)
+    {
+        $payroll=payroll::findOrFail($id);
+        $payroll->delete();
+        return redirect('/payroll')->with('success','Payroll Deleted successfully.');
+    }
+    public function edit($id)
+    {
+        $payroll = Payroll::findOrFail($id);
+        $employees = Employee::all();
+        return view('PayrollReport.payroll.create',compact('payroll','employees'));
+    }
+    public function update(Request $request, $id)
+    {
+        $payroll = Payroll::findOrFail($id);
+        $employee = Employee::findOrFail($request->employee_id);
+        $perDaySalary = $employee->basic_salary /30;
+        $leaveDeduction = $perDaySalary*$request->unpaid_leave_days;
+        $netSalary = $employee->basic_salary+ $request->bonus- $leaveDeduction;
+
+        $payroll->update([
+            'employee_id'=>$employee->id,
+            'month' => $request->month,
+        'year' => $request->year,
+        'bonus' => $request->bonus,
+        'unpaid_leave_days' => $request->unpaid_leave_days,
+        'leave_deduction' => $leaveDeduction,
+        'net_salary' => $netSalary,
+        ]);
+        return redirect('/payroll')->with('success','Payroll updated successfully.');
     }
 }
