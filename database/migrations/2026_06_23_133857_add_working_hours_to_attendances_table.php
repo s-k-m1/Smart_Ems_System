@@ -8,22 +8,22 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('company_settings', function (Blueprint $table) {
+        // Schema::create('company_settings', function (Blueprint $table) {
 
-            $table->id();
+        //     $table->id();
 
-            $table->integer('monthly_working_hours')->default(205);
+        //     $table->integer('monthly_working_hours')->default(205);
 
-            $table->integer('annual_leave_days')->default(12);
+        //     $table->integer('annual_leave_days')->default(12);
 
-            $table->string('weekly_holiday')->default('Saturday');
+        //     $table->string('weekly_holiday')->default('Saturday');
 
-            $table->timestamps();
-        });
+        //     $table->timestamps();
+        // });
     }
 
     public function down(): void
     {
-        Schema::dropIfExists('company_settings');
+        // Schema::dropIfExists('company_settings');
     }
 };

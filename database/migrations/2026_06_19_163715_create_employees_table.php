@@ -8,40 +8,40 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::create(
-            'employees',
+        // Schema::create(
+        //     'employees',
 
-            function (Blueprint $table) {
+        //     function (Blueprint $table) {
 
-                $table->id();
+        //         $table->id();
 
-                $table
-                ->string('employee_id')
-                ->unique();
+        //         $table
+        //         ->string('employee_id')
+        //         ->unique();
 
-                $table
-                ->string('name');
+        //         $table
+        //         ->string('name');
 
-                $table
-                ->string('phone');
+        //         $table
+        //         ->string('phone');
 
-                $table
-                ->string('email')
-                ->unique();
+        //         $table
+        //         ->string('email')
+        //         ->unique();
 
-                $table
-                ->string('department');
+        //         $table
+        //         ->string('department');
 
-                $table
-                ->timestamps();
-            }
-        );
+        //         $table
+        //         ->timestamps();
+        //     }
+        // );
     }
 
     public function down()
     {
-        Schema::dropIfExists(
-            'employees'
-        );
+        // Schema::dropIfExists(
+        //     'employees'
+        // );
     }
 };

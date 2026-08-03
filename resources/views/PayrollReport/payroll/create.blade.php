@@ -28,6 +28,11 @@
             @method('PUT')
 
             @else
+            @if(session('error'))
+            <div class="mb-6 rounded-lg border border-red-300 bg-red-100 px-4 py-3 text-red-700">
+                {{session('error')}}
+            </div>
+            @endif
             <form action="/payroll" method="POST">
                 @csrf
                 @endif
@@ -109,16 +114,7 @@
                             class="w-full rounded-xl border border-gray-300 px-4 py-3">
                     </div>
                     <!-- Leave -->
-                    <div>
-                        <label class="block mb-2 font-semibold text-gray-700">
-                            Unpaid Leave Days
-                        </label>
-                        <input
-                            type="number"
-                            name="unpaid_leave_days"
-                            value="{{ old('unpaid_leave_days', $payroll->unpaid_leave_days ?? 0) }}"
-                            class="w-full rounded-xl border border-gray-300 px-4 py-3">
-                    </div>
+                  
                 </div>
                 <div class="border-t mt-10 pt-8 flex justify-end gap-4">
                     <a href="/payroll" class="px-6 py-3 rounded-xl bg-gray-300 hover:bg-gray-400">
