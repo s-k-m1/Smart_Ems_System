@@ -5,4 +5,3 @@ use App\Http\Controllers\PayrollController;
 
 Route::get('/payroll',[PayrollController::class, 'index'])
 ->name('payroll.index');
-
