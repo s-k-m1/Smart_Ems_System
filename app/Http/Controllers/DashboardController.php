@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Attendance;
 use App\Models\Employee;
 use App\Models\Leave;
-use App\Models\Payroll;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
@@ -68,15 +67,10 @@ class DashboardController extends Controller
             ->groupBy('department')
             ->pluck('count', 'department');
 
-        // Payroll summary
-        $payrollThisMonth = Payroll::where('month', now()->format('Y-m'))
-            ->selectRaw("SUM(basic_salary) as total_basic, SUM(allowances) as total_allowances, SUM(deductions) as total_deductions, SUM(net_pay) as total_net")
-            ->first();
-
         return compact(
             'totalEmployees', 'activeEmployees', 'todayAttendance', 'pendingLeaves',
             'months', 'presentData', 'absentData', 'lateData', 'workingHoursData',
-            'deptStats', 'payrollThisMonth'
+            'deptStats'
         );
     }
 

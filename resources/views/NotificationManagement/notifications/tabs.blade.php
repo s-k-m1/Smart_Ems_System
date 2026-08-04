@@ -3,7 +3,6 @@ $categories = [
     'All' => 'All Notices',
     'Company' => 'Company',
     'HR' => 'HR',
-    'Payroll' => 'Payroll',
     'Policies' => 'Policies',
     'Training' => 'Training',
     'Events' => 'Events',
@@ -71,23 +70,6 @@ $currentCategory = request('category', 'All');
                                 stroke-linejoin="round"
                                 stroke-width="2"
                                 d="M17 20h5V4H2v16h5m10 0v-6H7v6m10 0H7"/>
-
-                        </svg>
-
-                    @break
-
-                    @case('Payroll')
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="w-5 h-5"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor">
-
-                            <path stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M12 8c-2 0-4 1-4 3s2 3 4 3 4 1 4 3-2 3-4 3m0-12V4m0 16v-2"/>
 
                         </svg>
 

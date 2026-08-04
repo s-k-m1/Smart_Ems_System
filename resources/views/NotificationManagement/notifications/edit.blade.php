@@ -48,7 +48,6 @@
                     <select name="category" class="w-full border rounded-lg p-3 text-sm sm:text-base">
                         <option value="Company" {{ $notification->category == 'Company' ? 'selected' : '' }}>Company</option>
                         <option value="HR" {{ $notification->category == 'HR' ? 'selected' : '' }}>HR</option>
-                        <option value="Payroll" {{ $notification->category == 'Payroll' ? 'selected' : '' }}>Payroll</option>
                         <option value="Policies" {{ $notification->category == 'Policies' ? 'selected' : '' }}>Policies</option>
                         <option value="Training" {{ $notification->category == 'Training' ? 'selected' : '' }}>Training</option>
                         <option value="Events" {{ $notification->category == 'Events' ? 'selected' : '' }}>Events</option>

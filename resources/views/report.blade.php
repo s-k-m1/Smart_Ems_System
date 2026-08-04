@@ -7,12 +7,11 @@
         <div class="px-4 sm:px-8 py-4 sm:py-8">
 
             <h1 class="text-2xl font-bold mb-1">Reports</h1>
-            <p class="text-gray-500 mb-4">Attendance, payroll, and employee distribution overview</p>
+            <p class="text-gray-500 mb-4">Attendance and employee distribution overview</p>
 
             <!-- Tab buttons. data-tab tells our JS which panel to show. -->
             <div class="flex gap-2 mb-4">
                 <button class="tab-btn bg-blue-600 text-white px-4 py-2 rounded" data-tab="attendance">Attendance</button>
-                <button class="tab-btn bg-gray-200 px-4 py-2 rounded" data-tab="payroll">Payroll</button>
                 <button class="tab-btn bg-gray-200 px-4 py-2 rounded" data-tab="distribution">Distribution</button>
             </div>
 
@@ -92,60 +91,7 @@
             </section>
 
             <!-- ====================================================== -->
-            <!-- TAB 2: PAYROLL / SALARY                                 -->
-            <!-- ====================================================== -->
-            <section id="panel-payroll" class="tab-panel hidden">
-
-                <div class="grid grid-cols-4 gap-4 mb-4">
-                    <div class="bg-white p-4 rounded">
-                        <p class="text-gray-500 text-sm">Total Employees</p>
-                        <p class="text-xl font-bold" id="payTotal">{{ $payrollSummary['total_employees'] }}</p>
-                    </div>
-                    <div class="bg-white p-4 rounded">
-                        <p class="text-gray-500 text-sm">Total Payroll</p>
-                        <p class="text-xl font-bold" id="payTotalAmount">Rs. {{ number_format($payrollSummary['total_payroll']) }}</p>
-                    </div>
-                    <div class="bg-white p-4 rounded">
-                        <p class="text-gray-500 text-sm">Paid</p>
-                        <p class="text-xl font-bold text-green-600" id="payPaid">{{ $payrollSummary['paid'] }}</p>
-                    </div>
-                    <div class="bg-white p-4 rounded">
-                        <p class="text-gray-500 text-sm">Pending</p>
-                        <p class="text-xl font-bold text-yellow-600" id="payPending">{{ $payrollSummary['pending'] }}</p>
-                    </div>
-                </div>
-
-                <div class="bg-white p-4 rounded mb-4 flex flex-wrap gap-4">
-                    <div>
-                        <label class="block text-sm text-gray-500">Status</label>
-                        <select id="payStatusFilter" class="border p-2 rounded">
-                            <option value="">All</option>
-                            <option value="Paid">Paid</option>
-                            <option value="Pending">Pending</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm text-gray-500">Search</label>
-                        <input type="text" id="paySearchBox" placeholder="Search by name..." class="border p-2 rounded">
-                    </div>
-                    <button id="payResetBtn" class="bg-gray-200 px-4 py-2 rounded self-end">Reset</button>
-                </div>
-
-                <table class="w-full bg-white rounded">
-                    <thead>
-                        <tr class="bg-gray-50 text-left">
-                            <th class="p-3">Name</th>
-                            <th class="p-3">Salary (Rs.)</th>
-                            <th class="p-3">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="payTableBody"></tbody>
-                </table>
-                <p id="payEmptyState" class="text-center text-gray-500 p-4 hidden">No records match the selected filters.</p>
-            </section>
-
-            <!-- ====================================================== -->
-            <!-- TAB 3: EMPLOYEE DISTRIBUTION                            -->
+            <!-- TAB 2: EMPLOYEE DISTRIBUTION                            -->
             <!-- ====================================================== -->
             <section id="panel-distribution" class="tab-panel hidden">
 
@@ -190,7 +136,6 @@
 // turns php into js use
 
     const attendanceData   = @json($attendanceData);
-    const payrollData      = @json($payrollData);
     const distributionData = @json($distributionData);
 
 
@@ -288,60 +233,7 @@
         renderAttendance(attendanceData);
     });
 
-    //      payroll
-    function renderPayroll(rows) {
-        const tableBody = document.getElementById('payTableBody');
-        tableBody.innerHTML = '';
-
-        if (rows.length === 0) {
-            document.getElementById('payEmptyState').classList.remove('hidden');
-        } else {
-            document.getElementById('payEmptyState').classList.add('hidden');
-        }
-
-        rows.forEach(function (row) {
-            const tr = document.createElement('tr');
-            tr.innerHTML =
-                '<td class="p-3 border-t">' + row.name + '</td>' +
-                '<td class="p-3 border-t">Rs. ' + row.salary.toLocaleString() + '</td>' +
-                '<td class="p-3 border-t">' + row.status + '</td>';
-            tableBody.appendChild(tr);
-        });
-
-        // add up the salary column to get a total for the filtered rows
-        let totalAmount = 0;
-        rows.forEach(function (row) {
-            totalAmount = totalAmount + row.salary;
-        });
-
-        document.getElementById('payTotal').textContent       = rows.length;
-        document.getElementById('payTotalAmount').textContent = 'Rs. ' + totalAmount.toLocaleString();
-        document.getElementById('payPaid').textContent        = rows.filter(r => r.status === 'Paid').length;
-        document.getElementById('payPending').textContent     = rows.filter(r => r.status === 'Pending').length;
-    }
-
-    function filterPayroll() {
-        const status = document.getElementById('payStatusFilter').value;
-        const search = document.getElementById('paySearchBox').value.toLowerCase();
-
-        const filteredRows = payrollData.filter(function (row) {
-            if (status && row.status !== status) return false;
-            if (search && !row.name.toLowerCase().includes(search)) return false;
-            return true;
-        });
-
-        renderPayroll(filteredRows);
-    }
-
-    document.getElementById('payStatusFilter').addEventListener('change', filterPayroll);
-    document.getElementById('paySearchBox').addEventListener('input', filterPayroll);
-
-    document.getElementById('payResetBtn').addEventListener('click', function () {
-        document.getElementById('payStatusFilter').value = '';
-        document.getElementById('paySearchBox').value = '';
-        renderPayroll(payrollData);
-    });
-// employee distribution
+    // employee distribution
     // This tab is a little different: on top of a table, it also
     // shows a small card per department with a count of how many
     // employees are in it. renderDeptCards() builds those cards.
@@ -421,7 +313,6 @@
     // When the page first loads, show everything with no filters applied, so the tables aren't empty.
 
     renderAttendance(attendanceData);
-    renderPayroll(payrollData);
     renderDistribution(distributionData);
 
 </script>

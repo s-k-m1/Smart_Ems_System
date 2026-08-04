@@ -12,7 +12,6 @@
                 <a href="/notifications" class="text-slate-600 hover:text-slate-800 transition">Notifications</a>
                 @if(Auth::user()->isAdmin())
                     <a href="/report" class="text-slate-600 hover:text-slate-800 transition">Reports</a>
-                    <a href="/payroll" class="text-slate-600 hover:text-slate-800 transition">Payroll</a>
                 @endif
             </div>
         </div>

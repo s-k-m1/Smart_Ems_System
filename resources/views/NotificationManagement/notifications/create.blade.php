@@ -77,7 +77,6 @@
 
                         <option value="Company">Company</option>
                         <option value="HR">HR</option>
-                        <option value="Payroll">Payroll</option>
                         <option value="Policies">Policies</option>
                         <option value="Training">Training</option>
                         <option value="Events">Events</option>
