@@ -75,31 +75,6 @@
         <canvas id="hoursChart" height="120"></canvas>
     </div>
 
-    {{-- Payroll Summary --}}
-    <div id="payroll-section" @if(!($payrollThisMonth && $payrollThisMonth->total_basic)) style="display:none" @else style="display:block" @endif>
-    <div class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 mb-8">
-        <h3 class="text-base sm:text-lg font-semibold text-slate-800 mb-4">Payroll Summary — <span id="payroll-month">{{ now()->format('F Y') }}</span></h3>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div class="bg-slate-50 rounded-xl p-4">
-                <p class="text-sm text-slate-500">Total Basic Salary</p>
-                <p id="payroll-total-basic" class="text-xl font-bold text-slate-800">Rs. {{ $payrollThisMonth ? number_format($payrollThisMonth->total_basic, 2) : '0.00' }}</p>
-            </div>
-            <div class="bg-slate-50 rounded-xl p-4">
-                <p class="text-sm text-slate-500">Total Allowances</p>
-                <p id="payroll-total-allowances" class="text-xl font-bold text-green-600">Rs. {{ $payrollThisMonth ? number_format($payrollThisMonth->total_allowances, 2) : '0.00' }}</p>
-            </div>
-            <div class="bg-slate-50 rounded-xl p-4">
-                <p class="text-sm text-slate-500">Total Deductions</p>
-                <p id="payroll-total-deductions" class="text-xl font-bold text-red-600">Rs. {{ $payrollThisMonth ? number_format($payrollThisMonth->total_deductions, 2) : '0.00' }}</p>
-            </div>
-            <div class="bg-slate-50 rounded-xl p-4">
-                <p class="text-sm text-slate-500">Net Payable</p>
-                <p id="payroll-total-net" class="text-xl font-bold text-indigo-600">Rs. {{ $payrollThisMonth ? number_format($payrollThisMonth->total_net, 2) : '0.00' }}</p>
-            </div>
-        </div>
-    </div>
-    </div>
-
     {{-- Navigation Cards --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
         <a href="/employees" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-indigo-200 transition group">
@@ -153,18 +128,7 @@
                 </div>
                 <div class="min-w-0">
                     <h3 class="text-base sm:text-lg font-semibold text-slate-800">Reports</h3>
-                    <p class="text-slate-500 text-sm mt-0.5">Generate attendance, payroll, and distribution reports</p>
-                </div>
-            </div>
-        </a>
-        <a href="/payroll" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-emerald-200 transition group">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center group-hover:bg-emerald-100 transition shrink-0">
-                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-                </div>
-                <div class="min-w-0">
-                    <h3 class="text-base sm:text-lg font-semibold text-slate-800">Payroll</h3>
-                    <p class="text-slate-500 text-sm mt-0.5">Manage payroll information</p>
+                    <p class="text-slate-500 text-sm mt-0.5">Generate attendance and distribution reports</p>
                 </div>
             </div>
         </a>
@@ -177,10 +141,6 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var COLORS = ['#6366f1', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#ec4899', '#f97316'];
-
-    function formatCurrency(n) {
-        return 'Rs. ' + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    }
 
     // Attendance Trend Chart
     var ctx1 = document.getElementById('attendanceChart').getContext('2d');
@@ -314,19 +274,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 hoursChart.data.labels = data.months;
                 hoursChart.data.datasets[0].data = data.workingHoursData;
                 hoursChart.update('none');
-
-                // Update payroll
-                var payrollSection = document.getElementById('payroll-section');
-                if (data.payrollThisMonth && data.payrollThisMonth.total_basic) {
-                    payrollSection.style.display = 'block';
-                    document.getElementById('payroll-month').textContent = data.payrollThisMonth.month || new Date().toLocaleString('en-US', { month: 'long', year: 'numeric' });
-                    document.getElementById('payroll-total-basic').textContent = formatCurrency(data.payrollThisMonth.total_basic);
-                    document.getElementById('payroll-total-allowances').textContent = formatCurrency(data.payrollThisMonth.total_allowances);
-                    document.getElementById('payroll-total-deductions').textContent = formatCurrency(data.payrollThisMonth.total_deductions);
-                    document.getElementById('payroll-total-net').textContent = formatCurrency(data.payrollThisMonth.total_net);
-                } else {
-                    payrollSection.style.display = 'none';
-                }
             })
             .catch(function (err) { console.warn('Dashboard poll error:', err); });
     }

@@ -8,7 +8,6 @@ use App\Models\Attendance;
 use App\Models\Leave;
 use App\Models\CompanySetting;
 use App\Models\Notification;
-use App\Models\Payroll;
 use Illuminate\Database\Seeder;
 
 class AdminSeeder extends Seeder
@@ -187,7 +186,6 @@ class AdminSeeder extends Seeder
             $notifications = [
                 ['title' => 'Annual Leave Policy Update', 'description' => 'The annual leave policy has been updated. Please review the new changes in the employee handbook.', 'category' => 'Policies', 'priority' => 'High', 'is_pinned' => true, 'published_by' => 'HR Manager'],
                 ['title' => 'Company Holiday Schedule', 'description' => 'The holiday schedule for the upcoming quarter has been released. Please check the company calendar for details.', 'category' => 'Company', 'priority' => 'Medium', 'is_pinned' => false, 'published_by' => 'Administrator'],
-                ['title' => 'Payroll Processing Notice', 'description' => 'Payroll for this month will be processed on the 28th. Please ensure all timesheets are submitted by the 25th.', 'category' => 'Payroll', 'priority' => 'High', 'is_pinned' => true, 'published_by' => 'Finance Department'],
                 ['title' => 'Team Building Event', 'description' => 'We are organizing a team building event next Friday. Please confirm your attendance with HR.', 'category' => 'Events', 'priority' => 'Low', 'is_pinned' => false, 'published_by' => 'HR Manager'],
                 ['title' => 'New Training Program', 'description' => 'A new training program on Leadership Skills is now available. Interested employees can register through the HR portal.', 'category' => 'Training', 'priority' => 'Medium', 'is_pinned' => false, 'published_by' => 'Training Department'],
                 ['title' => 'Office Renovation Notice', 'description' => 'The 2nd floor will undergo renovation from next month. Please coordinate with your managers for temporary seating arrangements.', 'category' => 'Company', 'priority' => 'Medium', 'is_pinned' => false, 'published_by' => 'Administrator'],
@@ -205,29 +203,6 @@ class AdminSeeder extends Seeder
                     'published_by' => $note['published_by'],
                     'publish_date' => now()->subDays(7 - $i),
                 ]);
-            }
-        }
-
-        // ── Payroll (only if table is empty) ──────────────────────
-        if (Payroll::count() === 0) {
-            $allEmployees = Employee::all();
-            for ($m = 2; $m >= 0; $m--) {
-                $month = now()->subMonths($m)->format('Y-m');
-                foreach ($allEmployees as $emp) {
-                    $basic = $emp->salary;
-                    $allowances = round($basic * 0.2, 2);
-                    $deductions = round($basic * 0.05, 2);
-                    Payroll::create([
-                        'employee_id' => $emp->id,
-                        'month' => $month,
-                        'basic_salary' => $basic,
-                        'allowances' => $allowances,
-                        'deductions' => $deductions,
-                        'net_pay' => $basic + $allowances - $deductions,
-                        'status' => $m === 0 ? 'pending' : 'paid',
-                        'payment_date' => $m === 0 ? null : now()->subMonths($m)->subDays(rand(1, 15)),
-                    ]);
-                }
             }
         }
 

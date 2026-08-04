@@ -13,7 +13,6 @@ return Application::configure(basePath: dirname(__DIR__))
             require __DIR__.'/../routes/CoreSystem/core.routes.php';
             require __DIR__.'/../routes/AttendanceLeave/attendance.php';
             require __DIR__.'/../routes/EmployeeManagement/employee.routes.php';
-            require __DIR__.'/../routes/PayrollReport/payroll.routes.php';
         }
     )
     ->withMiddleware(function (Middleware $middleware): void {

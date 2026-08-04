@@ -8,7 +8,6 @@ use App\Models\Attendance;
 use App\Models\Leave;
 use App\Models\CompanySetting;
 use App\Models\Notification;
-use App\Models\Payroll;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -220,18 +219,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Notification::create([
-            'title'        => 'New Payroll Schedule',
-            'description'  => 'Payroll for July will be processed on the 28th. Please ensure all timesheets are submitted by the 25th.',
-            'category'     => 'Payroll',
-            'department'   => null,
-            'priority'     => 'Medium',
-            'is_pinned'    => false,
-            'published_by' => 'HR User',
-            'publish_date' => now()->subDays(1),
-            'status'       => true,
-        ]);
-
-        Notification::create([
             'title'        => 'Office Closure Notice',
             'description'  => 'The office will remain closed on August 15th for Independence Day. Please plan accordingly.',
             'category'     => 'Holiday',
@@ -266,27 +253,5 @@ class DatabaseSeeder extends Seeder
             'publish_date' => now()->subDays(5),
             'status'       => true,
         ]);
-
-        // ── Payroll ────────────────────────────────────────────────
-        $months = ['2025-06', '2025-07'];
-        foreach ($employees as $emp) {
-            foreach ($months as $month) {
-                $basic = $emp->salary;
-                $allowances = $basic * 0.1;
-                $deductions = $basic * 0.05;
-                $net = $basic + $allowances - $deductions;
-                Payroll::create([
-                    'employee_id'  => $emp->id,
-                    'month'        => $month,
-                    'basic_salary' => $basic,
-                    'allowances'   => $allowances,
-                    'deductions'   => $deductions,
-                    'net_pay'      => $net,
-                    'payment_date' => $month === '2025-06' ? now()->subDays(20) : null,
-                    'status'       => $month === '2025-06' ? 'paid' : 'pending',
-                    'notes'        => $month === '2025-06' ? 'Processed on time' : null,
-                ]);
-            }
-        }
     }
 }
