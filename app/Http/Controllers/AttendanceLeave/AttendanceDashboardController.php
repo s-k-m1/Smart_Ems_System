@@ -64,49 +64,104 @@ class AttendanceDashboardController extends Controller
             ->whereBetween('date', [now()->startOfMonth()->format('Y-m-d'), now()->format('Y-m-d')])
             ->sum('working_hours');
 
-        // Monthly chart
-        $monthlyRaw = Attendance::where('employee_id', $selectedEmployeeId)
-            ->whereBetween('date', [now()->startOfYear()->format('Y-m-d'), now()->format('Y-m-d')])
-            ->get(['date', 'status']);
-
-        $monthlyGrouped = $monthlyRaw->groupBy(fn($r) => (int)\Carbon\Carbon::parse($r->date)->format('m'));
-        $monthlyAttendance = [];
-        for ($month = 1; $month <= now()->month; $month++) {
-            $monthData = $monthlyGrouped->get($month, collect());
-            $monthPresent = $monthData->where('status', 'Present')->count();
-            $monthTotal = $monthData->count();
-            $percentage = $monthTotal ? round(($monthPresent / $monthTotal) * 100) : 0;
-            $monthlyAttendance[] = [
-                'month' => date('F', mktime(0, 0, 0, $month, 1)),
-                'percentage' => $percentage,
-            ];
-        }
-
-        // Weekly summary
+        // Weekly summary (scoped to the selected employee)
         $weekStart = now()->startOfWeek();
         $weekEnd = $weekStart->copy()->addDays(5);
-        $weeklyRecords = Attendance::whereBetween('date', [$weekStart, $weekEnd])
+        $weeklyRecords = Attendance::where('employee_id', $selectedEmployeeId)
+            ->whereBetween('date', [$weekStart, $weekEnd])
             ->where('status', 'Present')
-            ->get(['date', 'employee_id']);
+            ->get(['date']);
 
         $weeklyGrouped = $weeklyRecords->groupBy(fn($r) => \Carbon\Carbon::parse($r->date)->format('Y-m-d'));
-        $totalEmployees = Employee::count();
         $weeklySummary = [];
         for ($i = 0; $i < 6; $i++) {
             $dayDate = $weekStart->copy()->addDays($i);
             $presentCount = ($weeklyGrouped->get($dayDate->format('Y-m-d'), collect()))->count();
             $weeklySummary[] = [
                 'day' => $dayDate->format('l'),
-                'present' => $totalEmployees ? round(($presentCount / $totalEmployees) * 100) : 0,
+                'present' => $presentCount ? 100 : 0,
             ];
         }
 
         return view('AttendanceLeave.attendance.index', compact(
             'employee', 'employeesForSelect',
             'present', 'late', 'undertime', 'absent', 'rate',
-            'monthlyAttendance', 'monthlyWorkingHours', 'annualLeaves',
+            'monthlyWorkingHours', 'annualLeaves',
             'weeklyHoliday', 'currentMonthHours', 'weeklySummary'
         ));
+    }
+
+    // CHART DATA (JSON)
+    public function chartData(Request $request)
+    {
+        $user = auth()->user();
+        $allEmployees = Employee::all();
+
+        if ($user->isEmployee()) {
+            $employee = $user->employee;
+            $selectedEmployeeId = $employee?->id;
+        } else {
+            $selectedEmployeeId = $request->integer('employee');
+            if (!$selectedEmployeeId || !$allEmployees->contains('id', $selectedEmployeeId)) {
+                $selectedEmployeeId = $allEmployees->first()?->id;
+            }
+            $employee = $allEmployees->firstWhere('id', $selectedEmployeeId);
+        }
+
+        $labels = [];
+        $present = [];
+        $late = [];
+        $undertime = [];
+        $absent = [];
+        $rates = [];
+
+        if ($selectedEmployeeId) {
+            $monthlyRaw = Attendance::where('employee_id', $selectedEmployeeId)
+                ->whereBetween('date', [now()->startOfYear()->format('Y-m-d'), now()->format('Y-m-d')])
+                ->get(['date', 'status']);
+
+            $monthlyGrouped = $monthlyRaw->groupBy(fn($r) => (int)\Carbon\Carbon::parse($r->date)->format('m'));
+
+            for ($month = 1; $month <= now()->month; $month++) {
+                $monthData = $monthlyGrouped->get($month, collect());
+                $p = $monthData->where('status', 'Present')->count();
+                $l = $monthData->where('status', 'Late')->count();
+                $u = $monthData->where('status', 'Undertime')->count();
+                $a = $monthData->where('status', 'Absent')->count();
+                $total = $p + $l + $u + $a;
+
+                $labels[] = date('M', mktime(0, 0, 0, $month, 1));
+                $present[] = $p;
+                $late[] = $l;
+                $undertime[] = $u;
+                $absent[] = $a;
+                $rates[] = $total ? round(($p / $total) * 100) : 0;
+            }
+        }
+
+        $yearCounts = $selectedEmployeeId
+            ? Attendance::where('employee_id', $selectedEmployeeId)
+                ->whereBetween('date', [now()->startOfYear()->format('Y-m-d'), now()->format('Y-m-d')])
+                ->selectRaw("status, COUNT(*) as count")
+                ->groupBy('status')
+                ->get()
+                ->pluck('count', 'status')
+            : collect();
+
+        $yearTotal = array_sum($yearCounts->all());
+        $yearPresent = ($yearCounts['Present'] ?? 0) + ($yearCounts['Late'] ?? 0) + ($yearCounts['Undertime'] ?? 0);
+
+        return response()->json([
+            'labels' => $labels,
+            'present' => $present,
+            'late' => $late,
+            'undertime' => $undertime,
+            'absent' => $absent,
+            'rates' => $rates,
+            'yearRate' => $yearTotal ? round(($yearPresent / $yearTotal) * 100) : 0,
+            'employee' => $employee?->name ?? null,
+            'year' => now()->year,
+        ]);
     }
 // CREATE PAGE
     public function create()

@@ -11,18 +11,19 @@ use App\Http\Controllers\NotificationManagement\NotificationController;
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['web', 'auth', 'permission:view_attendance'])->group(function () {
 
     Route::get('/attendance', [AttendanceDashboardController::class, 'index']);
-    Route::get('/attendance/create', [AttendanceDashboardController::class, 'create'])->middleware('role:admin,hr');
-    Route::post('/attendance/store', [AttendanceDashboardController::class, 'store'])->middleware('role:admin,hr');
+    Route::get('/attendance/chart-data', [AttendanceDashboardController::class, 'chartData']);
+    Route::get('/attendance/create', [AttendanceDashboardController::class, 'create'])->middleware('permission:manage_attendance');
+    Route::post('/attendance/store', [AttendanceDashboardController::class, 'store'])->middleware('permission:manage_attendance');
 
-    Route::get('/attendance/{id}/edit', [AttendanceDashboardController::class, 'edit'])->middleware('role:admin,hr');
-    Route::post('/attendance/{id}/update', [AttendanceDashboardController::class, 'update'])->middleware('role:admin,hr');
+    Route::get('/attendance/{id}/edit', [AttendanceDashboardController::class, 'edit'])->middleware('permission:manage_attendance');
+    Route::post('/attendance/{id}/update', [AttendanceDashboardController::class, 'update'])->middleware('permission:manage_attendance');
 
-    Route::delete('/attendance/{id}/delete', [AttendanceDashboardController::class, 'destroy'])->middleware('role:admin,hr');
+    Route::delete('/attendance/{id}/delete', [AttendanceDashboardController::class, 'destroy'])->middleware('permission:manage_attendance');
 
-    Route::get('/attendance/report', [AttendanceDashboardController::class, 'report'])->middleware('role:admin,hr');
+    Route::get('/attendance/report', [AttendanceDashboardController::class, 'report'])->middleware('permission:view_attendance');
 
     /*
     |--------------------------------------------------------------------------
@@ -30,10 +31,10 @@ Route::middleware(['web', 'auth'])->group(function () {
     |--------------------------------------------------------------------------
     */
 
-    Route::get('/leave', [LeaveController::class, 'index']);
-    Route::post('/leave/store', [LeaveController::class,'store'])->middleware('role:admin,hr,employee');
-    Route::post('/leave/{id}/approve', [LeaveController::class, 'approve'])->middleware('role:admin,hr');
-    Route::post('/leave/{id}/reject', [LeaveController::class, 'reject'])->middleware('role:admin,hr');
+    Route::get('/leave', [LeaveController::class, 'index'])->middleware('permission:view_leave');
+    Route::post('/leave/store', [LeaveController::class,'store'])->middleware('permission:manage_leave');
+    Route::post('/leave/{id}/approve', [LeaveController::class, 'approve'])->middleware('permission:manage_leave');
+    Route::post('/leave/{id}/reject', [LeaveController::class, 'reject'])->middleware('permission:manage_leave');
 
     /*
     |--------------------------------------------------------------------------
@@ -43,37 +44,37 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     // Notifications
     Route::get('/notifications', [NotificationController::class, 'index'])
-        ->name('notifications.index');
+        ->name('notifications.index')->middleware('permission:view_notifications');
 
     Route::get('/notifications/create', [NotificationController::class, 'create'])
         ->name('notifications.create')
-        ->middleware('role:admin,hr');
+        ->middleware('permission:manage_notifications');
 
     Route::post('/notifications/store', [NotificationController::class, 'store'])
         ->name('notifications.store')
-        ->middleware('role:admin,hr');
+        ->middleware('permission:manage_notifications');
 
     Route::get('/notifications/{id}', [NotificationController::class, 'show'])
-        ->name('notifications.show');
+        ->name('notifications.show')->middleware('permission:view_notifications');
 
     Route::get('/notifications/{id}/edit', [NotificationController::class, 'edit'])
         ->name('notifications.edit')
-        ->middleware('role:admin,hr');
+        ->middleware('permission:manage_notifications');
 
     Route::post('/notifications/{id}/update', [NotificationController::class, 'update'])
         ->name('notifications.update')
-        ->middleware('role:admin,hr');
+        ->middleware('permission:manage_notifications');
 
     Route::delete('/notifications/{id}/delete', [NotificationController::class, 'destroy'])
         ->name('notifications.destroy')
-        ->middleware('role:admin,hr');
+        ->middleware('permission:manage_notifications');
 
     Route::post('/notifications/{id}/pin', [NotificationController::class, 'pin'])
         ->name('notifications.pin')
-        ->middleware('role:admin,hr');
+        ->middleware('permission:manage_notifications');
 
     Route::post('/notifications/{id}/unpin', [NotificationController::class, 'unpin'])
         ->name('notifications.unpin')
-        ->middleware('role:admin,hr');
+        ->middleware('permission:manage_notifications');
 
 });

@@ -15,15 +15,15 @@
 {{-- SUMMARY --}}
 <div class="grid grid-cols-3 gap-5 mb-6">
     <div class="bg-slate-700 text-white p-5 rounded-xl">
-        <p class="text-sm opacity-80">Annual Leave</p>
-        <p class="text-3xl font-bold mt-1">{{ \App\Models\Leave::where('type', 'Annual')->count() }}</p>
+        <p class="text-sm opacity-80">Annual Leave {{ auth()->user()->isEmployee() ? '(mine)' : '' }}</p>
+        <p class="text-3xl font-bold mt-1">{{ $annualLeaves }}</p>
     </div>
     <div class="bg-slate-600 text-white p-5 rounded-xl">
-        <p class="text-sm opacity-80">Sick Leave</p>
-        <p class="text-3xl font-bold mt-1">{{ \App\Models\Leave::where('type', 'Sick')->count() }}</p>
+        <p class="text-sm opacity-80">Sick Leave {{ auth()->user()->isEmployee() ? '(mine)' : '' }}</p>
+        <p class="text-3xl font-bold mt-1">{{ $sickLeaves }}</p>
     </div>
     <div class="bg-slate-800 text-white p-5 rounded-xl">
-        <p class="text-sm opacity-80">Total Leaves</p>
+        <p class="text-sm opacity-80">{{ auth()->user()->isEmployee() ? 'My Total' : 'Total Leaves' }}</p>
         <p class="text-3xl font-bold mt-1">{{ $history->count() }}</p>
     </div>
 </div>

@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PayrollController;
 
-Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['web', 'auth', 'permission:view_payroll'])->group(function () {
 
     Route::get('/payroll', [PayrollController::class, 'index'])
         ->name('payroll.index');

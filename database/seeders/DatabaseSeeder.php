@@ -2,144 +2,107 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
-use App\Models\Employee;
 use App\Models\Attendance;
-use App\Models\Leave;
 use App\Models\CompanySetting;
+use App\Models\Employee;
+use App\Models\Leave;
 use App\Models\Notification;
+use App\Models\Permission;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── Users ─────────────────────────────────────────────────
-        $admin = User::factory()->create([
-            'name'     => 'Admin User',
-            'email'    => 'admin@example.com',
-            'password' => bcrypt('password'),
-            'role'     => 'admin',
-        ]);
+        \Illuminate\Support\Facades\DB::table('attendances')->delete();
+        \Illuminate\Support\Facades\DB::table('leaves')->delete();
+        \Illuminate\Support\Facades\DB::table('notifications')->delete();
 
-        $hr = User::factory()->create([
-            'name'     => 'HR User',
-            'email'    => 'hr@example.com',
-            'password' => bcrypt('password'),
-            'role'     => 'hr',
-        ]);
+        mt_srand(20260804);
 
-        $employeeUser = User::factory()->create([
-            'name'     => 'Employee User',
-            'email'    => 'employee@example.com',
-            'password' => bcrypt('password'),
-            'role'     => 'employee',
-        ]);
+        // ── Users & Employees ─────────────────────────────────────
+        $people = [
+            ['email' => 'admin@example.com',   'name' => 'Admin User',     'role' => 'admin', null],
+            ['email' => 'hr@example.com',      'name' => 'HR User',        'role' => 'hr', 'EMP004', 'Human Resources', 'HR Manager', '2022-11-20', 75000.00],
+            ['email' => 'employee@example.com','name' => 'Employee User',  'role' => 'employee', 'EMP001', 'Engineering', 'Software Developer', '2024-01-15', 60000.00],
+            ['email' => 'john@example.com',    'name' => 'John Doe',       'role' => 'employee', 'EMP002', 'Engineering', 'Senior Developer', '2023-06-01', 85000.00],
+            ['email' => 'jane@example.com',    'name' => 'Jane Smith',     'role' => 'employee', 'EMP003', 'Marketing', 'Marketing Lead', '2024-03-10', 70000.00],
+            ['email' => 'skycse001@gmail.com', 'name' => 'saroj',          'role' => 'employee', 'EMP005', 'Engineering', 'Software Developer', '2024-01-15', 60000.00],
+            ['email' => 'bob@example.com',     'name' => 'Bob Wilson',     'role' => 'employee', 'EMP006', 'Engineering', 'Backend Developer', '2024-02-01', 70000.00],
+            ['email' => 'alice@example.com',   'name' => 'Alice Brown',    'role' => 'employee', 'EMP007', 'Design', 'UI/UX Designer', '2024-05-10', 72000.00],
+            ['email' => 'charlie@example.com', 'name' => 'Charlie Davis',  'role' => 'employee', 'EMP008', 'Finance', 'Accountant', '2023-09-01', 65000.00],
+            ['email' => 'diana@example.com',   'name' => 'Diana Evans',    'role' => 'employee', 'EMP009', 'Engineering', 'Frontend Developer', '2024-07-15', 68000.00],
+            ['email' => 'frank@example.com',   'name' => 'Frank Garcia',   'role' => 'employee', 'EMP010', 'Sales', 'Sales Executive', '2024-11-20', 62000.00],
+            ['email' => 'grace@example.com',   'name' => 'Grace Harris',   'role' => 'employee', 'EMP011', 'Human Resources', 'Recruiter', '2025-02-10', 58000.00],
+            ['email' => 'henry@example.com',   'name' => 'Henry Irving',   'role' => 'employee', 'EMP012', 'Engineering', 'DevOps Engineer', '2025-04-01', 82000.00],
+            ['email' => 'ivy@example.com',     'name' => 'Ivy Johnson',    'role' => 'employee', 'EMP013', 'Marketing', 'Content Writer', '2025-06-15', 55000.00],
+        ];
 
-        // Extra employees for richer data
-        $emp2 = User::factory()->create([
-            'name'     => 'John Doe',
-            'email'    => 'john@example.com',
-            'password' => bcrypt('password'),
-            'role'     => 'employee',
-        ]);
+        foreach ($people as $p) {
+            $user = User::firstOrCreate(
+                ['email' => $p['email']],
+                ['name' => $p['name'], 'password' => bcrypt('password'), 'role' => $p['role']]
+            );
 
-        $emp3 = User::factory()->create([
-            'name'     => 'Jane Smith',
-            'email'    => 'jane@example.com',
-            'password' => bcrypt('password'),
-            'role'     => 'employee',
-        ]);
-
-        // ── Employees ─────────────────────────────────────────────
-        $e1 = Employee::create([
-            'user_id'      => $employeeUser->id,
-            'employee_id'  => 'EMP001',
-            'name'         => 'Employee User',
-            'department'   => 'Engineering',
-            'position'     => 'Software Developer',
-            'status'       => 'Active',
-            'email'        => 'employee@example.com',
-            'phone'        => '555-0101',
-            'joined'       => '2024-01-15',
-            'address'      => '123 Main St, City',
-            'present_days' => 22,
-            'leave_taken'  => 2,
-            'salary'       => 60000.00,
-            'projects'     => 3,
-        ]);
-
-        $e2 = Employee::create([
-            'user_id'      => $emp2->id,
-            'employee_id'  => 'EMP002',
-            'name'         => 'John Doe',
-            'department'   => 'Engineering',
-            'position'     => 'Senior Developer',
-            'status'       => 'Active',
-            'email'        => 'john@example.com',
-            'phone'        => '555-0102',
-            'joined'       => '2023-06-01',
-            'address'      => '456 Oak Ave, City',
-            'present_days' => 20,
-            'leave_taken'  => 3,
-            'salary'       => 85000.00,
-            'projects'     => 5,
-        ]);
-
-        $e3 = Employee::create([
-            'user_id'      => $emp3->id,
-            'employee_id'  => 'EMP003',
-            'name'         => 'Jane Smith',
-            'department'   => 'Marketing',
-            'position'     => 'Marketing Lead',
-            'status'       => 'Active',
-            'email'        => 'jane@example.com',
-            'phone'        => '555-0103',
-            'joined'       => '2024-03-10',
-            'address'      => '789 Pine Rd, City',
-            'present_days' => 18,
-            'leave_taken'  => 1,
-            'salary'       => 70000.00,
-            'projects'     => 4,
-        ]);
-
-        $e4 = Employee::create([
-            'user_id'      => $hr->id,
-            'employee_id'  => 'EMP004',
-            'name'         => 'HR User',
-            'department'   => 'Human Resources',
-            'position'     => 'HR Manager',
-            'status'       => 'Active',
-            'email'        => 'hr@example.com',
-            'phone'        => '555-0104',
-            'joined'       => '2022-11-20',
-            'address'      => '321 Elm St, City',
-            'present_days' => 21,
-            'leave_taken'  => 4,
-            'salary'       => 75000.00,
-            'projects'     => 2,
-        ]);
-
-        // ── Attendance (last 30 days for each employee) ──────────
-        $statuses   = ['Present', 'Present', 'Present', 'Present', 'Late', 'Present', 'Absent', 'Present', 'Present', 'Undertime'];
-        $employees  = [$e1, $e2, $e3, $e4];
-        $start      = now()->subDays(29);
-
-        for ($day = 0; $day < 30; $day++) {
-            $date = $start->copy()->addDays($day);
-            if ($date->isSaturday()) {
+            if (($p[0] ?? null) === null) {
                 continue;
             }
-            foreach ($employees as $emp) {
-                $status = $statuses[array_rand($statuses)];
+
+            $emp = Employee::firstOrCreate(
+                ['employee_id' => $p[0]],
+                [
+                    'user_id'      => $user->id,
+                    'employee_id'  => $p[0],
+                    'name'         => $p['name'],
+                    'department'   => $p[1],
+                    'position'     => $p[2],
+                    'status'       => 'Active',
+                    'email'        => $p['email'],
+                    'phone'        => '555-01' . str_pad((string) mt_rand(50, 99), 2, '0'),
+                    'joined'       => $p[3],
+                    'address'      => 'Test Address, Kathmandu',
+                    'present_days' => 0,
+                    'leave_taken'  => 0,
+                    'salary'       => $p[4],
+                    'projects'     => mt_rand(1, 5),
+                ]
+            );
+        }
+
+        // ── Attendance (last 6 months, Saturdays off) ─────────────
+        $weights = ['Present', 'Present', 'Present', 'Present', 'Present', 'Late', 'Late', 'Present', 'Undertime', 'Present', 'Absent', 'Present', 'Late', 'Present', 'Absent'];
+        $allEmployees = Employee::all();
+        $start = now()->subMonths(5)->startOfMonth();
+        $end = now()->copy()->subDay();
+
+        foreach ($allEmployees as $emp) {
+            $presentCount = 0;
+            for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
+                if ($date->isSaturday()) {
+                    continue;
+                }
+
+                $status = $weights[array_rand($weights)];
                 $checkIn  = null;
                 $checkOut = null;
-                $hours    = 0;
+                $hours    = 0.00;
 
                 if (in_array($status, ['Present', 'Late', 'Undertime'])) {
-                    $checkIn  = $status === 'Late' ? '09:30:00' : '08:45:00';
-                    $checkOut = '17:00:00';
-                    $hours    = $status === 'Undertime' ? 6.5 : 8.0;
+                    if ($status === 'Late') {
+                        $checkIn  = '09:' . str_pad((string) mt_rand(20, 55), 2, '0') . ':00';
+                        $checkOut = '17:' . str_pad((string) mt_rand(0, 30), 2, '0', STR_PAD_LEFT) . ':00';
+                        $hours    = round(7.5 + mt_rand(0, 5) / 10, 1);
+                    } elseif ($status === 'Undertime') {
+                        $checkIn  = '08:' . str_pad((string) mt_rand(40, 55), 2, '0') . ':00';
+                        $checkOut = '15:' . str_pad((string) mt_rand(0, 30), 2, '0', STR_PAD_LEFT) . ':00';
+                        $hours    = round(5.5 + mt_rand(0, 10) / 10, 1);
+                    } else {
+                        $checkIn  = '08:' . str_pad((string) mt_rand(30, 55), 2, '0') . ':00';
+                        $checkOut = '17:' . str_pad((string) mt_rand(0, 30), 2, '0', STR_PAD_LEFT) . ':00';
+                        $hours    = round(8.0 + mt_rand(0, 5) / 10, 1);
+                    }
+                    $presentCount++;
                 }
 
                 Attendance::create([
@@ -151,107 +114,153 @@ class DatabaseSeeder extends Seeder
                     'working_hours' => $hours,
                 ]);
             }
+
+            $emp->present_days = $presentCount;
+            $emp->save();
         }
 
         // ── Leaves ────────────────────────────────────────────────
-        Leave::create([
-            'employee_id' => $e1->id,
-            'type'        => 'Annual',
-            'from_date'   => '2025-07-10',
-            'to_date'     => '2025-07-12',
-            'days'        => 3,
-            'reason'      => 'Family vacation',
-            'status'      => 'Approved',
-            'approver'    => 'HR User',
-        ]);
+        $types = ['Annual', 'Sick', 'Casual'];
+        $reasons = [
+            'Annual' => 'Annual vacation planned for this period',
+            'Sick'   => 'Medical leave advised by physician',
+            'Casual' => 'Personal family matter to attend to',
+        ];
+        $statusPool = ['Approved', 'Approved', 'Approved', 'Pending', 'Rejected'];
 
-        Leave::create([
-            'employee_id' => $e2->id,
-            'type'        => 'Sick',
-            'from_date'   => '2025-07-15',
-            'to_date'     => '2025-07-15',
-            'days'        => 1,
-            'reason'      => 'Doctor appointment',
-            'status'      => 'Approved',
-            'approver'    => 'HR User',
-        ]);
+        foreach ($allEmployees as $emp) {
+            $num = mt_rand(2, 4);
+            $leaveTaken = 0;
 
-        Leave::create([
-            'employee_id' => $e3->id,
-            'type'        => 'Casual',
-            'from_date'   => '2025-07-20',
-            'to_date'     => '2025-07-21',
-            'days'        => 2,
-            'reason'      => 'Personal errand',
-            'status'      => 'Pending',
-            'approver'    => null,
-        ]);
+            for ($i = 0; $i < $num; $i++) {
+                $type  = $types[array_rand($types)];
+                $status = $statusPool[array_rand($statusPool)];
+                $recent = ($i === 0 && mt_rand(0, 1) === 1)
+                    ? mt_rand(1, abs(now()->diffInDays($start)) + 1)
+                    : mt_rand(1, 170);
+                $from = now()->subDays($recent)->startOfDay();
+                $days = mt_rand(1, 5);
+                $to   = $from->copy()->addDays($days - 1);
 
-        Leave::create([
-            'employee_id' => $e4->id,
-            'type'        => 'Annual',
-            'from_date'   => '2025-08-01',
-            'to_date'     => '2025-08-05',
-            'days'        => 5,
-            'reason'      => 'Annual leave',
-            'status'      => 'Pending',
-            'approver'    => null,
-        ]);
+                if ($status === 'Approved') {
+                    $leaveTaken += $days;
+                }
+
+                Leave::create([
+                    'employee_id' => $emp->id,
+                    'type'        => $type,
+                    'from_date'   => $from->format('Y-m-d'),
+                    'to_date'     => $to->format('Y-m-d'),
+                    'days'        => $days,
+                    'reason'      => $reasons[$type],
+                    'status'      => $status,
+                    'approver'    => $status === 'Pending' ? null : 'HR User',
+                    'created_at'  => $from,
+                    'updated_at'  => now(),
+                ]);
+            }
+
+            $emp->leave_taken = $leaveTaken;
+            $emp->save();
+        }
+
+        // ── Notifications ─────────────────────────────────────────
+        $notifications = [
+            ['Welcome to Smart EMS', 'The Employee Management System is now live. Please explore the dashboard and complete your profile.', 'General',  null, 'High', true,  'Admin User', 30],
+            ['Office Closure for Independence Day', 'The office will be closed on August 15th. Please plan your work accordingly.', 'Holiday', null, 'Low', false, 'Admin User', 12],
+            ['Sprint Planning Meeting', 'Engineering sprint planning this Friday at 10 AM in Conference Room B.', 'Meeting',  'Engineering', 'High', true, 'Admin User', 5],
+            ['Quarterly Review Reminder', 'Managers must complete quarterly performance reviews by the end of this month.', 'HR', 'Human Resources', 'Medium', false, 'HR User', 8],
+            ['New Health Insurance Policy', 'The updated health insurance policy is now effective. Review the details on the HR portal.', 'Policies', null, 'Medium', false, 'HR User', 15],
+            ['Leadership Training Program', 'A new training program on Leadership Skills is available. Register through the HR portal.', 'Training', null, 'Medium', false, 'HR User', 6],
+            ['Annual Team Building Event', 'Annual team building event scheduled for next month. Confirm your attendance with HR.', 'Events',  null, 'Low', false, 'HR User', 3],
+            ['Company Town Hall', 'The quarterly town hall will be held at the main auditorium. All employees must attend.', 'Company', null, 'Medium', true, 'Admin User', 1],
+        ];
+
+        foreach ($notifications as $idx => $n) {
+            Notification::create([
+                'title'        => $n[0],
+                'description'  => $n[1],
+                'category'     => $n[2],
+                'department'   => $n[3],
+                'priority'     => $n[4],
+                'is_pinned'    => $n[5],
+                'published_by' => $n[6],
+                'publish_date' => now()->subDays($n[7]),
+                'status'       => true,
+            ]);
+        }
 
         // ── Company Settings ──────────────────────────────────────
-        CompanySetting::create([
+        CompanySetting::firstOrCreate(['id' => 1], [
             'monthly_working_hours' => 205,
             'annual_leave_days'     => 12,
             'weekly_holiday'        => 'Saturday',
         ]);
 
-        // ── Notifications ─────────────────────────────────────────
-        Notification::create([
-            'title'        => 'Welcome to Smart EMS',
-            'description'  => 'The Employee Management System is now live. Please explore the dashboard and update your profile.',
-            'category'     => 'General',
-            'department'   => null,
-            'priority'     => 'High',
-            'is_pinned'    => true,
-            'published_by' => 'Admin User',
-            'publish_date' => now(),
-            'status'       => true,
-        ]);
+        // ── Permissions ──────────────────────────────────────────
+        $this->seedPermissions();
 
-        Notification::create([
-            'title'        => 'Office Closure Notice',
-            'description'  => 'The office will remain closed on August 15th for Independence Day. Please plan accordingly.',
-            'category'     => 'Holiday',
-            'department'   => null,
-            'priority'     => 'Low',
-            'is_pinned'    => false,
-            'published_by' => 'Admin User',
-            'publish_date' => now()->subDays(2),
-            'status'       => true,
-        ]);
+        $this->command->info('Database seeded with test data.');
+        $this->command->info('Admin: admin@example.com / password');
+        $this->command->info('HR: hr@example.com / password');
+        $this->command->info('Employees: employee,john,jane,skycse001@gmail.com,bob,alice,charlie,diana,frank,grace,henry,ivy @example.com / password');
+    }
 
-        Notification::create([
-            'title'        => 'Engineering Team Meeting',
-            'description'  => 'Sprint planning meeting this Friday at 10 AM in Conference Room B. All engineering staff must attend.',
-            'category'     => 'Meeting',
-            'department'   => 'Engineering',
-            'priority'     => 'High',
-            'is_pinned'    => true,
-            'published_by' => 'Admin User',
-            'publish_date' => now()->subDays(3),
-            'status'       => true,
-        ]);
+    private function seedPermissions(): void
+    {
+        \Illuminate\Support\Facades\DB::table('permissions')->delete();
+        \Illuminate\Support\Facades\DB::table('role_permissions')->delete();
 
-        Notification::create([
-            'title'        => 'Quarterly Review Reminder',
-            'description'  => 'Managers are reminded to complete quarterly performance reviews by the end of this month.',
-            'category'     => 'HR',
-            'department'   => 'Human Resources',
-            'priority'     => 'Medium',
-            'is_pinned'    => false,
-            'published_by' => 'HR User',
-            'publish_date' => now()->subDays(5),
-            'status'       => true,
-        ]);
+        $permissions = [
+            ['name' => 'view_dashboard', 'label' => 'View Dashboard', 'group' => 'general'],
+            ['name' => 'manage_employees', 'label' => 'Manage Employees', 'group' => 'employees'],
+            ['name' => 'view_employees', 'label' => 'View Employees', 'group' => 'employees'],
+            ['name' => 'manage_attendance', 'label' => 'Manage Attendance', 'group' => 'attendance'],
+            ['name' => 'view_attendance', 'label' => 'View Attendance', 'group' => 'attendance'],
+            ['name' => 'manage_leave', 'label' => 'Manage Leave', 'group' => 'leave'],
+            ['name' => 'view_leave', 'label' => 'View Leave', 'group' => 'leave'],
+            ['name' => 'manage_notifications', 'label' => 'Manage Notifications', 'group' => 'notifications'],
+            ['name' => 'view_notifications', 'label' => 'View Notifications', 'group' => 'notifications'],
+            ['name' => 'manage_payroll', 'label' => 'Manage Payroll', 'group' => 'payroll'],
+            ['name' => 'view_payroll', 'label' => 'View Payroll', 'group' => 'payroll'],
+            ['name' => 'manage_reports', 'label' => 'Manage Reports', 'group' => 'reports'],
+            ['name' => 'view_reports', 'label' => 'View Reports', 'group' => 'reports'],
+        ];
+
+        foreach ($permissions as $perm) {
+            Permission::firstOrCreate(['name' => $perm['name']], $perm);
+        }
+
+        $allPermissionIds = Permission::pluck('id', 'name');
+
+        $rolePermissions = [
+            'admin' => array_keys($allPermissionIds->toArray()),
+            'hr' => [
+                'view_dashboard', 'view_employees', 'manage_employees',
+                'view_attendance', 'manage_attendance',
+                'view_leave', 'manage_leave',
+                'view_notifications', 'manage_notifications',
+                'view_payroll', 'manage_payroll',
+                'view_reports',
+            ],
+            'employee' => [
+                'view_dashboard', 'view_employees',
+                'view_attendance', 'manage_attendance',
+                'view_leave', 'manage_leave',
+                'view_notifications',
+            ],
+        ];
+
+        foreach ($rolePermissions as $role => $permNames) {
+            foreach ($permNames as $permName) {
+                $permId = $allPermissionIds[$permName] ?? null;
+                if ($permId) {
+                    \DB::table('role_permissions')->updateOrInsert(
+                        ['role' => $role, 'permission_id' => $permId],
+                        ['created_at' => now(), 'updated_at' => now()]
+                    );
+                }
+            }
+        }
     }
 }

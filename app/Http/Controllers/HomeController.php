@@ -19,9 +19,4 @@ class HomeController extends Controller
         }
         return redirect('/login');
     }
-
-    public function detail()
-    {
-        return view('EmployeDetail.index');
-    }
 }

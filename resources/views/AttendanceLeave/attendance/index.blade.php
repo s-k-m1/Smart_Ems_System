@@ -16,6 +16,7 @@
             mb-8
         "
     >
+        @if(!auth()->user()->isEmployee())
         <a
             href="/attendance/create"
             class="
@@ -47,6 +48,7 @@
         >
             Report
         </a>
+        @endif
 
         @if($employeesForSelect->isNotEmpty())
         <div class="ml-auto">

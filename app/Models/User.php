@@ -46,6 +46,32 @@ class User extends Authenticatable
         return in_array($this->role, $roles);
     }
 
+    public function hasPermission(string $permission): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return Permission::where('name', $permission)
+            ->whereHas('roles', function ($query) {
+                $query->where('role', $this->role);
+            })
+            ->exists();
+    }
+
+    public function hasAnyPermission(array $permissions): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        return Permission::whereIn('name', $permissions)
+            ->whereHas('roles', function ($query) {
+                $query->where('role', $this->role);
+            })
+            ->exists();
+    }
+
     public function sendPasswordResetNotification($token): void
     {
         $this->notify(new PasswordReset($token));

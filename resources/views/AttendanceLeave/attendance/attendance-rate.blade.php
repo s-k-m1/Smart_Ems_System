@@ -9,11 +9,11 @@
             </h1>
 
             <div class="mt-3 inline-block px-5 py-2 rounded-full bg-blue-50 text-blue-500 text-sm">
-                This Year
+                This Year ({{ now()->year }})
             </div>
         </div>
 
-        <h1 class="text-[48px] lg:text-[60px] xl:text-[72px] font-bold text-slate-700 leading-none">
+        <h1 id="attRateBig" class="text-[48px] lg:text-[60px] xl:text-[72px] font-bold text-slate-700 leading-none">
             {{ $rate }}%
         </h1>
 
@@ -22,51 +22,107 @@
     <hr class="my-8">
 
     <p class="text-gray-500 font-medium mb-8">
-        Monthly Rate
+        Monthly Rate ({{ $employee->name }})
     </p>
 
-    {{-- Monthly Blocks --}}
-    <div class="flex items-end gap-4 overflow-x-auto pb-4">
-
-        @php
-            $colors = [
-                'bg-blue-500',
-                'bg-orange-400',
-                'bg-green-400',
-                'bg-purple-500',
-                'bg-pink-500',
-                'bg-indigo-500',
-            ];
-        @endphp
-
-        @foreach($monthlyAttendance as $index => $month)
-
-            @php
-                $height = max(120, $month['percentage'] * 3);
-            @endphp
-
-            <div
-                class="min-w-[110px] rounded-[24px] text-white p-5 flex flex-col justify-between {{ $colors[$index % count($colors)] }}"
-                style="height: {{ $height }}px"
-            >
-
-                <p class="text-sm">
-                    {{ $month['month'] }}
-                </p>
-
-                <h2 class="text-2xl font-bold">
-                    {{ $month['percentage'] }}%
-                </h2>
-
-            </div>
-
-        @endforeach
-
+    {{-- Dynamic Chart --}}
+    <div class="relative h-[280px]">
+        <canvas id="attendanceRateChart"></canvas>
     </div>
 
     {{-- Footer --}}
     <div class="mt-8 text-gray-400 leading-7">
-        Employee monthly attendance rate highlights consistent attendance performance.
+        Employee monthly attendance rate highlights consistent attendance performance. Chart updates live as records change.
     </div>
 
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var ctx = document.getElementById('attendanceRateChart');
+    if (!ctx) return;
+
+    var chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: 'Present',
+                    data: [],
+                    backgroundColor: 'rgba(59, 130, 246, 0.8)',
+                    borderColor: 'rgb(37, 99, 235)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Late',
+                    data: [],
+                    backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                    borderColor: 'rgb(217, 119, 6)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Undertime',
+                    data: [],
+                    backgroundColor: 'rgba(249, 115, 22, 0.8)',
+                    borderColor: 'rgb(234, 88, 12)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Absent',
+                    data: [],
+                    backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                    borderColor: 'rgb(220, 38, 38)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { stacked: true, grid: { display: false } },
+                y: { stacked: true, beginAtZero: true, ticks: { precision: 0 } }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { usePointStyle: true, padding: 14 } }
+            }
+        }
+    });
+
+    function fetchAttendanceChart() {
+        var selector = document.getElementById('employeeSelect');
+        var employeeId = selector ? selector.value : '';
+        var url = '/attendance/chart-data' + (employeeId ? '?employee=' + employeeId : '');
+
+        fetch(url)
+            .then(function (r) { return r.json(); })
+            .then(function (data) {
+                chart.data.labels = data.labels;
+                chart.data.datasets[0].data = data.present;
+                chart.data.datasets[1].data = data.late;
+                chart.data.datasets[2].data = data.undertime;
+                chart.data.datasets[3].data = data.absent;
+                chart.update('none');
+
+                var big = document.getElementById('attRateBig');
+                if (big && data.yearRate !== null && data.yearRate !== undefined) {
+                    big.textContent = data.yearRate + '%';
+                }
+            })
+            .catch(function (err) { console.warn('Attendance chart fetch error:', err); });
+    }
+
+    fetchAttendanceChart();
+
+    // Live updates when the page becomes visible again (after saving attendance elsewhere)
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) fetchAttendanceChart();
+    });
+    window.addEventListener('focus', fetchAttendanceChart);
+    window.addEventListener('storage', function (e) {
+        if (e.key === 'attendance_updated') fetchAttendanceChart();
+    });
+});
+</script>

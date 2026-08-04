@@ -21,17 +21,24 @@ class LeaveController extends Controller
                 $history = Leave::where('employee_id', $employee->id)
                     ->orderBy('created_at', 'desc')
                     ->get();
+
+                $annualLeaves = Leave::where('employee_id', $employee->id)->where('type', 'Annual')->count();
+                $sickLeaves = Leave::where('employee_id', $employee->id)->where('type', 'Sick')->count();
             } else {
                 $history = collect();
+                $annualLeaves = 0;
+                $sickLeaves = 0;
             }
 
-            return view('AttendanceLeave.attendance.LeaveManagement.leave', compact('history'));
+            return view('AttendanceLeave.attendance.LeaveManagement.leave', compact('history', 'annualLeaves', 'sickLeaves'));
         }
 
         // Admin / HR: see all leave records
         $history = Leave::with('employee')->orderBy('created_at', 'desc')->get();
+        $annualLeaves = Leave::where('type', 'Annual')->count();
+        $sickLeaves = Leave::where('type', 'Sick')->count();
 
-        return view('AttendanceLeave.attendance.LeaveManagement.leave', compact('history'));
+        return view('AttendanceLeave.attendance.LeaveManagement.leave', compact('history', 'annualLeaves', 'sickLeaves'));
     }
 
     // STORE LEAVE

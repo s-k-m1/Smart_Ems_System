@@ -28,11 +28,10 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/detail', [HomeController::class, 'detail'])->name('EmployeDetail.index');
 
     Route::get('/report', [ReportController::class, 'index'])
         ->name('report.index')
-        ->middleware('role:admin');
+        ->middleware('permission:view_reports');
 });
 
 Route::get('/reset-log', function () {
