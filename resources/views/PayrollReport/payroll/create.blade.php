@@ -31,7 +31,7 @@
             <form action="/payroll" method="POST">
                 @csrf
                 @endif
-                <div class="grid gird-cols-2 gap-8">
+                <div class="grid grid-cols-2 gap-8">
                     <!-- Employee -->
                     <div>
                         <label class="block mb-2 font-semibold text-gray-700">

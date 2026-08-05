@@ -53,7 +53,7 @@ class PayrollController extends Controller
     }
     public function destroy($id)
     {
-        $payroll=payroll::findOrFail($id);
+        $payroll = Payroll::findOrFail($id);
         $payroll->delete();
         return redirect('/payroll')->with('success','Payroll Deleted successfully.');
     }

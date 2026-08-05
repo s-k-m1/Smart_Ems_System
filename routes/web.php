@@ -41,3 +41,19 @@ Route::get('/reset-log', function () {
     }
     return '<pre>' . htmlspecialchars(file_get_contents($log)) . '</pre>';
 });
+
+Route::get('/docs/report', function () {
+    $path = base_path('Smart_EMS_System_Report.pdf');
+    if (!file_exists($path)) {
+        abort(404, 'Report not found.');
+    }
+    return response()->download($path, 'Smart_EMS_System_Report.pdf');
+})->name('docs.report');
+
+Route::get('/docs/report/doc', function () {
+    $path = base_path('Smart_EMS_System_Report.docx');
+    if (!file_exists($path)) {
+        abort(404, 'Report not found.');
+    }
+    return response()->download($path, 'Smart_EMS_System_Report.docx');
+})->name('docs.report.doc');

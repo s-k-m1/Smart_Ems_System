@@ -3,16 +3,26 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class EmployeeController extends Controller
 {
     public function index()
     {
-        $employees = Employee::latest()->get();
+        if (auth()->user()->isEmployee()) {
+            $employee = auth()->user()->employee;
+            return view('employees.index', [
+                'employees' => $employee ? collect([$employee]) : collect(),
+                'isEmployee' => true,
+            ]);
+        }
+
+        $employees = Employee::latest()->paginate(10);
 
         return view('employees.index', [
             'employees' => $employees,
+            'isEmployee' => false,
         ]);
     }
 
@@ -32,6 +42,11 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee)
     {
+        $user = auth()->user();
+        if (!$user || (!$user->hasAnyRole([User::ROLE_ADMIN, User::ROLE_HR]) && (!$user->employee || $user->employee->id !== $employee->id))) {
+            abort(403, 'Unauthorized. You can only edit your own profile.');
+        }
+
         return view('employees.edit', [
             'employee' => $employee,
         ]);
@@ -39,6 +54,11 @@ class EmployeeController extends Controller
 
     public function update(Request $request, Employee $employee)
     {
+        $user = auth()->user();
+        if (!$user || (!$user->hasAnyRole([User::ROLE_ADMIN, User::ROLE_HR]) && (!$user->employee || $user->employee->id !== $employee->id))) {
+            abort(403, 'Unauthorized. You can only edit your own profile.');
+        }
+
         $validated = $this->validateEmployee($request, $employee->id);
 
         $employee->update($validated);

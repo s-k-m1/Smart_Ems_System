@@ -16,9 +16,11 @@ class PermissionController extends Controller
         $rolePermissions = [];
 
         foreach ($roles as $role) {
-            $rolePermissions[$role] = Permission::whereHas('roles', function ($query) use ($role) {
-                $query->where('role', $role);
-            })->pluck('name')->toArray();
+            $rolePermissions[$role] = \Illuminate\Support\Facades\DB::table('role_permissions')
+                ->join('permissions', 'permissions.id', '=', 'role_permissions.permission_id')
+                ->where('role_permissions.role', $role)
+                ->pluck('permissions.name')
+                ->toArray();
         }
 
         return view('Admin.permissions.index', compact('permissions', 'grouped', 'roles', 'rolePermissions'));

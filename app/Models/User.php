@@ -52,10 +52,10 @@ class User extends Authenticatable
             return true;
         }
 
-        return Permission::where('name', $permission)
-            ->whereHas('roles', function ($query) {
-                $query->where('role', $this->role);
-            })
+        return \Illuminate\Support\Facades\DB::table('role_permissions')
+            ->join('permissions', 'permissions.id', '=', 'role_permissions.permission_id')
+            ->where('role_permissions.role', $this->role)
+            ->where('permissions.name', $permission)
             ->exists();
     }
 
@@ -65,10 +65,10 @@ class User extends Authenticatable
             return true;
         }
 
-        return Permission::whereIn('name', $permissions)
-            ->whereHas('roles', function ($query) {
-                $query->where('role', $this->role);
-            })
+        return \Illuminate\Support\Facades\DB::table('role_permissions')
+            ->join('permissions', 'permissions.id', '=', 'role_permissions.permission_id')
+            ->where('role_permissions.role', $this->role)
+            ->whereIn('permissions.name', $permissions)
             ->exists();
     }
 

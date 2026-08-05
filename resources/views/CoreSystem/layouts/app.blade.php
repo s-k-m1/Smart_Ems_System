@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>@yield('title', 'Smart EMS')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     @stack('styles')
 </head>
 <body class="bg-slate-50 min-h-screen">
@@ -27,7 +28,9 @@
 
     {{-- Main content --}}
     <div id="mainContent" class="lg:ml-64 min-h-screen pt-14 lg:pt-0">
-        @yield('content')
+        <div class="lg:pl-6 pl-4 pr-4 py-6">
+            @yield('content')
+        </div>
     </div>
 
     @stack('scripts')
