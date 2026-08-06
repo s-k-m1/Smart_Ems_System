@@ -24,7 +24,7 @@
     </div>
     <div class="bg-slate-800 text-white p-5 rounded-xl">
         <p class="text-sm opacity-80">{{ auth()->user()->isEmployee() ? 'My Total' : 'Total Leaves' }}</p>
-        <p class="text-3xl font-bold mt-1">{{ $history->count() }}</p>
+        <p class="text-3xl font-bold mt-1">{{ method_exists($history, 'total') ? $history->total() : $history->count() }}</p>
     </div>
 </div>
 
@@ -60,7 +60,16 @@
 
 {{-- LEAVE HISTORY --}}
 <div class="bg-white rounded-xl shadow overflow-hidden overflow-x-auto">
-<div class="bg-slate-800 p-4 text-white font-bold text-lg">Leave History</div>
+<div class="bg-slate-800 p-4 text-white font-bold text-lg flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 dark:bg-slate-800">
+    <span>Leave History</span>
+    <form method="GET" action="/leave" class="flex items-center gap-2 w-full sm:w-auto">
+        <input type="text" name="search" value="{{ request('search') }}" placeholder="Search type, employee, date, status..." class="w-full sm:w-72 bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300">
+        <button type="submit" class="bg-slate-600 hover:bg-slate-500 text-white text-sm px-4 py-2 rounded-lg shrink-0">Search</button>
+        @if(request('search'))
+        <a href="/leave" class="text-sm text-slate-300 hover:text-white shrink-0">Clear</a>
+        @endif
+    </form>
+</div>
 <table class="w-full text-left min-w-[700px]">
 <thead class="bg-gray-100">
 <tr>
@@ -120,6 +129,15 @@
 @endforeach
 </tbody>
 </table>
+
+@if(method_exists($history, 'links'))
+<div class="px-4 sm:px-6 py-5 bg-gray-50 dark:bg-slate-800 border-t border-slate-200 dark:border-slate-700">
+    <div class="overflow-x-auto">
+        {{ $history->appends(request()->query())->links() }}
+    </div>
+</div>
+@endif
+
 </div>
 
 </div>

@@ -10,35 +10,62 @@ use Carbon\Carbon;
 class LeaveController extends Controller
 {
     // SHOW PAGE
-    public function index()
+    public function index(Request $request)
     {
         $user = auth()->user();
+        $search = $request->query('search');
 
         // Employee: only see own leave records
         if ($user->isEmployee()) {
             $employee = $user->employee;
             if ($employee) {
-                $history = Leave::where('employee_id', $employee->id)
-                    ->orderBy('created_at', 'desc')
-                    ->get();
+                $builder = Leave::where('employee_id', $employee->id);
+
+                if ($search) {
+                    $builder->where(function ($q) use ($search) {
+                        $q->where('type', 'like', "%{$search}%")
+                            ->orWhere('from_date', 'like', "%{$search}%")
+                            ->orWhere('to_date', 'like', "%{$search}%")
+                            ->orWhere('status', 'like', "%{$search}%")
+                            ->orWhere('reason', 'like', "%{$search}%");
+                    });
+                }
+
+                $history = $builder->orderBy('created_at', 'desc')->paginate(10);
 
                 $annualLeaves = Leave::where('employee_id', $employee->id)->where('type', 'Annual')->count();
                 $sickLeaves = Leave::where('employee_id', $employee->id)->where('type', 'Sick')->count();
             } else {
-                $history = collect();
+                $history = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 10);
                 $annualLeaves = 0;
                 $sickLeaves = 0;
             }
 
-            return view('AttendanceLeave.attendance.LeaveManagement.leave', compact('history', 'annualLeaves', 'sickLeaves'));
+            return view('AttendanceLeave.attendance.LeaveManagement.leave', compact('history', 'annualLeaves', 'sickLeaves', 'search'));
         }
 
         // Admin / HR: see all leave records
-        $history = Leave::with('employee')->orderBy('created_at', 'desc')->get();
+        $builder = Leave::with('employee');
+
+        if ($search) {
+            $builder->where(function ($q) use ($search) {
+                $q->where('type', 'like', "%{$search}%")
+                    ->orWhere('from_date', 'like', "%{$search}%")
+                    ->orWhere('to_date', 'like', "%{$search}%")
+                    ->orWhere('status', 'like', "%{$search}%")
+                    ->orWhere('reason', 'like', "%{$search}%")
+                    ->orWhereHas('employee', function ($eq) use ($search) {
+                        $eq->where('name', 'like', "%{$search}%")
+                            ->orWhere('employee_id', 'like', "%{$search}%");
+                    });
+            });
+        }
+
+        $history = $builder->orderBy('created_at', 'desc')->paginate(10);
         $annualLeaves = Leave::where('type', 'Annual')->count();
         $sickLeaves = Leave::where('type', 'Sick')->count();
 
-        return view('AttendanceLeave.attendance.LeaveManagement.leave', compact('history', 'annualLeaves', 'sickLeaves'));
+        return view('AttendanceLeave.attendance.LeaveManagement.leave', compact('history', 'annualLeaves', 'sickLeaves', 'search'));
     }
 
     // STORE LEAVE
