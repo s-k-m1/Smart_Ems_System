@@ -225,11 +225,24 @@
             <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
 
                 <a href="{{ route('notifications.show',$notification->id) }}"
-                    class="w-full sm:w-auto text-center px-4 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 text-sm font-medium transition">
+                    class="w-full sm:w-auto text-center px-4 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 text-sm font-medium transition"
+                    onclick="markAsRead(event, {{ $notification->id }})">
 
                     {!! $isRead ? 'View' : '<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>View</span>' !!}
 
                 </a>
+
+                @if(!$isRead)
+
+                <button type="button"
+                    onclick="markAsRead(event, {{ $notification->id }})"
+                    class="w-full sm:w-auto text-center px-4 py-2 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 text-sm font-medium transition">
+
+                    Mark read
+
+                </button>
+
+                @endif
 
                 @if($canManage)
 

@@ -309,7 +309,10 @@
                             font-medium
                         "
                     >
-                        {{ $att->date }}
+                        {{ \Carbon\Carbon::parse($att->date)->format('M d, Y') }}
+                        @if($att->date && \Carbon\Carbon::parse($att->date)->format('H:i:s') !== '00:00:00')
+                            <span class="block text-xs text-slate-400">{{ \Carbon\Carbon::parse($att->date)->format('g:i A') }}</span>
+                        @endif
                     </td>
 
                     {{-- Actions --}}

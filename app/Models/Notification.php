@@ -35,9 +35,11 @@ class Notification extends Model
 
     public function markAsRead(User $user): void
     {
-        $this->readByUsers()->syncWithoutDetaching([
-            $user->id => ['is_read' => true, 'read_at' => now()],
-        ]);
+        \DB::table('notification_user')
+            ->updateOrInsert(
+                ['notification_id' => $this->id, 'user_id' => $user->id],
+                ['is_read' => true, 'read_at' => now(), 'updated_at' => now()]
+            );
     }
 
     public function isReadBy(User $user): bool

@@ -96,7 +96,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($permissions as $perm)
+                    @forelse($permissions as $perm)
                     <tr class="border-b border-slate-100 hover:bg-slate-50 transition">
                         <td class="py-3 px-3 font-mono text-slate-700">{{ $perm->name }}</td>
                         <td class="py-3 px-3 text-slate-600">{{ $perm->label ?? '-' }}</td>
@@ -115,7 +115,7 @@
                     <tr>
                         <td colspan="4" class="py-6 text-center text-slate-400">No permissions defined yet.</td>
                     </tr>
-                    @endforeach
+                    @endforelse
                 </tbody>
             </table>
         </div>

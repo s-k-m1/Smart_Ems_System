@@ -146,6 +146,39 @@
                 </div>
             </div>
         </a>
+        <a href="/attendance/create" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-green-200 transition group">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition shrink-0">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-base sm:text-lg font-semibold text-slate-800">Check In</h3>
+                    <p class="text-slate-500 text-sm mt-0.5">Record employee arrival</p>
+                </div>
+            </div>
+        </a>
+        <a href="/attendance/create" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-red-200 transition group">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center group-hover:bg-red-100 transition shrink-0">
+                    <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-base sm:text-lg font-semibold text-slate-800">Check Out</h3>
+                    <p class="text-slate-500 text-sm mt-0.5">Record employee departure</p>
+                </div>
+            </div>
+        </a>
+        <a href="/attendance" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-amber-200 transition group">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center group-hover:bg-amber-100 transition shrink-0">
+                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-base sm:text-lg font-semibold text-slate-800">Edit Attendance</h3>
+                    <p class="text-slate-500 text-sm mt-0.5">Fix attendance records</p>
+                </div>
+            </div>
+        </a>
         <a href="/leave" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-yellow-200 transition group">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-yellow-50 flex items-center justify-center group-hover:bg-yellow-100 transition shrink-0">

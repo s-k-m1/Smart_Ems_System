@@ -42,8 +42,8 @@ class DashboardController extends Controller
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
             $label = $date->format('M');
-            $monthStart = $date->startOfMonth()->format('Y-m-d');
-            $monthEnd = $date->copy()->endOfMonth()->format('Y-m-d');
+            $monthStart = $date->copy()->startOfMonth();
+            $monthEnd = $date->copy()->endOfMonth()->endOfDay();
             $monthEndFormatted = $date->format('Y-m');
 
             $records = Attendance::whereBetween('date', [$monthStart, $monthEnd])
@@ -108,8 +108,8 @@ class DashboardController extends Controller
 
         for ($i = 5; $i >= 0; $i--) {
             $date = now()->subMonths($i);
-            $monthStart = $date->startOfMonth()->format('Y-m-d');
-            $monthEnd = $date->copy()->endOfMonth()->format('Y-m-d');
+            $monthStart = $date->copy()->startOfMonth();
+            $monthEnd = $date->copy()->endOfMonth()->endOfDay();
 
             $records = Attendance::whereBetween('date', [$monthStart, $monthEnd])
                 ->selectRaw("status, COUNT(*) as count")
@@ -145,7 +145,7 @@ class DashboardController extends Controller
 
         // Present days this month (Present/Late/Undertime = attended)
         $presentDays = Attendance::where('employee_id', $employee->id)
-            ->whereBetween('date', [now()->startOfMonth()->format('Y-m-d'), now()->format('Y-m-d')])
+            ->whereBetween('date', [now()->startOfMonth(), now()->endOfDay()])
             ->whereIn('status', ['Present', 'Late', 'Undertime'])
             ->count();
 
@@ -161,12 +161,12 @@ class DashboardController extends Controller
 
         // Working hours this month
         $workingHours = Attendance::where('employee_id', $employee->id)
-            ->whereBetween('date', [now()->startOfMonth()->format('Y-m-d'), now()->format('Y-m-d')])
+            ->whereBetween('date', [now()->startOfMonth(), now()->endOfDay()])
             ->sum('working_hours');
 
         // Attendance rate this year
         $yearCounts = Attendance::where('employee_id', $employee->id)
-            ->whereBetween('date', [now()->startOfYear()->format('Y-m-d'), now()->format('Y-m-d')])
+            ->whereBetween('date', [now()->startOfYear(), now()->endOfDay()])
             ->selectRaw("status, COUNT(*) as count")
             ->groupBy('status')
             ->get()
@@ -198,6 +198,10 @@ class DashboardController extends Controller
             $lateData[] = (int) ($records['Late'] ?? 0);
         }
 
+        $todayAttendance = Attendance::where('employee_id', $employee->id)
+            ->whereDate('date', now()->toDateString())
+            ->first();
+
         $recentAttendance = Attendance::where('employee_id', $employee->id)
             ->orderBy('date', 'desc')
             ->limit(7)
@@ -205,7 +209,7 @@ class DashboardController extends Controller
 
         return view('CoreSystem.dashboard.employee', compact(
             'employee', 'presentDays', 'leaveTaken', 'pendingLeaves', 'workingHours',
-            'attendanceRate', 'months', 'presentData', 'absentData', 'lateData', 'recentAttendance'
+            'attendanceRate', 'months', 'presentData', 'absentData', 'lateData', 'recentAttendance', 'todayAttendance'
         ));
     }
 }

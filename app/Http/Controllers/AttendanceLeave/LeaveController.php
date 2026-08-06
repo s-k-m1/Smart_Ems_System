@@ -75,8 +75,8 @@ class LeaveController extends Controller
 
         $request->validate([
             'type' => 'required',
-            'from_date' => 'required',
-            'to_date' => 'required',
+            'from_date' => 'required|date|after_or_equal:' . today()->toDateString(),
+            'to_date' => 'required|date|after_or_equal:from_date',
             'reason' => 'required'
         ]);
 

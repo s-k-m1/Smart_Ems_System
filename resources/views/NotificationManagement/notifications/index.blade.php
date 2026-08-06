@@ -167,6 +167,26 @@
 
         document.addEventListener('DOMContentLoaded', refreshUnreadCounts);
         setInterval(refreshUnreadCounts, 20000);
+
+        async function markAsRead(event, id) {
+            event.preventDefault();
+            try {
+                const res = await fetch("{{ route('notifications.mark-read', ':id') }}"
+                    .replace(':id', id), {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+                    }
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (data.success) {
+                    refreshUnreadCounts();
+                }
+            } catch (e) {}
+        }
     </script>
     @endpush
 

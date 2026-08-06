@@ -306,6 +306,23 @@ class NotificationController extends Controller
         return back()->with('success', 'Notification Unpinned Successfully.');
     }
 
+    //  Mark a single notification as read for the current user
+    public function markAsRead(Request $request, $id)
+    {
+        $notification = Notification::findOrFail($id);
+        $user = auth()->user();
+
+        \DB::table('notification_user')
+            ->updateOrInsert(
+                ['notification_id' => $id, 'user_id' => $user->id],
+                ['is_read' => true, 'read_at' => now(), 'updated_at' => now()]
+            );
+
+        return response()->json(['success' => true, 'unreadCount' => $this->visibleQuery()->whereDoesntHave('readByUsers', function ($q) use ($user) {
+            $q->where('user_id', $user->id)->where('is_read', true);
+        })->count()]);
+    }
+
     //  Mark all visible notifications as read for the current user
     public function markAllAsRead()
     {
@@ -313,9 +330,13 @@ class NotificationController extends Controller
 
         $ids = $this->visibleQuery()->pluck('id');
 
-        $user->notificationsRead()->syncWithoutDetaching(
-            $ids->mapWithKeys(fn($id) => [$id => ['is_read' => true, 'read_at' => now()]])
-        );
+        foreach ($ids as $id) {
+            \DB::table('notification_user')
+                ->updateOrInsert(
+                    ['notification_id' => $id, 'user_id' => $user->id],
+                    ['is_read' => true, 'read_at' => now(), 'updated_at' => now()]
+                );
+        }
 
         return redirect()
             ->route('notifications.index')

@@ -18,6 +18,12 @@ Route::middleware(['web', 'auth', 'permission:view_attendance'])->group(function
     Route::get('/attendance/create', [AttendanceDashboardController::class, 'create'])->middleware('permission:manage_attendance');
     Route::post('/attendance/store', [AttendanceDashboardController::class, 'store'])->middleware('permission:manage_attendance');
 
+    Route::post('/attendance/quick-check-in', [AttendanceDashboardController::class, 'quickCheckIn'])->middleware('permission:manage_attendance');
+    Route::post('/attendance/quick-check-out', [AttendanceDashboardController::class, 'quickCheckOut'])->middleware('permission:manage_attendance');
+    Route::post('/attendance/report-issue', [AttendanceDashboardController::class, 'reportIssue'])->middleware('permission:view_attendance');
+
+    Route::post('/attendance/request-edit/{id}', [AttendanceDashboardController::class, 'requestEdit'])->middleware('permission:view_attendance');
+
     Route::get('/attendance/{id}/edit', [AttendanceDashboardController::class, 'edit'])->middleware('permission:manage_attendance');
     Route::post('/attendance/{id}/update', [AttendanceDashboardController::class, 'update'])->middleware('permission:manage_attendance');
 
@@ -56,6 +62,10 @@ Route::middleware(['web', 'auth', 'permission:view_attendance'])->group(function
 
     Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])
         ->name('notifications.mark-all-read')
+        ->middleware('permission:view_notifications');
+
+    Route::post('/notifications/{id}/mark-read', [NotificationController::class, 'markAsRead'])
+        ->name('notifications.mark-read')
         ->middleware('permission:view_notifications');
 
     Route::get('/notifications/unread-counts', [NotificationController::class, 'unreadCounts'])

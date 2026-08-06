@@ -99,6 +99,17 @@
                 </div>
             </div>
         </a>
+        <a href="/attendance/create" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-green-200 transition group">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center group-hover:bg-green-100 transition shrink-0">
+                    <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="text-base sm:text-lg font-semibold text-slate-800">Add Attendance</h3>
+                    <p class="text-slate-500 text-sm mt-0.5">Record attendance for any previous date</p>
+                </div>
+            </div>
+        </a>
         <a href="/leave" class="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100 hover:shadow-md hover:border-indigo-200 transition group">
             <div class="flex items-center gap-4">
                 <div class="w-12 h-12 rounded-xl bg-yellow-50 flex items-center justify-center group-hover:bg-yellow-100 transition shrink-0">

@@ -29,6 +29,7 @@
 </div>
 
 {{-- APPLY FORM --}}
+@if(!auth()->user()->isAdmin())
 <div class="bg-white p-6 rounded-xl shadow mb-6">
 <form method="POST" action="/leave/store">
 @csrf
@@ -43,11 +44,11 @@
     </div>
     <div>
         <label class="text-gray-700">From Date</label>
-        <input type="date" name="from_date" class="w-full border border-gray-300 p-2 rounded">
+        <input type="date" name="from_date" min="{{ today()->toDateString() }}" class="w-full border border-gray-300 p-2 rounded">
     </div>
     <div>
         <label class="text-gray-700">To Date</label>
-        <input type="date" name="to_date" class="w-full border border-gray-300 p-2 rounded">
+        <input type="date" name="to_date" min="{{ today()->toDateString() }}" class="w-full border border-gray-300 p-2 rounded">
     </div>
     <div>
         <label class="text-gray-700">Reason</label>
@@ -57,6 +58,7 @@
 <button class="mt-4 bg-slate-700 hover:bg-slate-900 text-white px-6 py-2 rounded">Submit</button>
 </form>
 </div>
+@endif
 
 {{-- LEAVE HISTORY --}}
 <div class="bg-white rounded-xl shadow overflow-hidden overflow-x-auto">

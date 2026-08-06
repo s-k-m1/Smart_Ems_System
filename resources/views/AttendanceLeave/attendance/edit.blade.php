@@ -73,9 +73,9 @@
                     <label class="block mb-1.5 text-[13px] font-medium text-slate-500 dark:text-slate-400">
                         Attendance Date
                     </label>
-                    <input type="date" name="date" value="{{ $attendance->date }}" required
-                           min="{{ $attendance->date }}"
-                           max="{{ $attendance->date }}"
+                    <input type="date" name="date" value="{{ \Carbon\Carbon::parse($attendance->date)->format('Y-m-d') }}" required
+                           min="{{ \Carbon\Carbon::parse($attendance->date)->format('Y-m-d') }}"
+                           max="{{ \Carbon\Carbon::parse($attendance->date)->format('Y-m-d') }}"
                            class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:border-indigo-400 transition" />
                 </div>
 
