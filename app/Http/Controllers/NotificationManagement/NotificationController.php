@@ -9,9 +9,7 @@ use App\Models\Notification;
 
 class NotificationController extends Controller
 {
-    
-    //  Display Notifications
-    public function index(Request $request)
+    private function visibleQuery()
     {
         $user = auth()->user();
 
@@ -29,22 +27,38 @@ class NotificationController extends Controller
             });
         }
 
+        return $query;
+    }
+
+    private function ensureCanManage()
+    {
+        $user = auth()->user();
+
+        abort_unless(
+            $user && ($user->isAdmin() || $user->isHr() || $user->hasPermission('manage_notifications')),
+            403,
+            'You do not have permission to manage notifications.'
+        );
+    }
+
+    //  Display Notifications
+    public function index(Request $request)
+    {
+        $user = auth()->user();
+
+        $query = $this->visibleQuery();
+
         // Search
         if ($request->filled('search')) {
-
             $query->where(function ($q) use ($request) {
-
                 $q->where('title', 'like', '%' . $request->search . '%')
                   ->orWhere('description', 'like', '%' . $request->search . '%');
-
             });
         }
 
         // Category Filter
         if ($request->filled('category') && $request->category != 'All') {
-
             $query->where('category', $request->category);
-
         }
 
         $notifications = $query
@@ -60,47 +74,97 @@ class NotificationController extends Controller
             ->take(5)
             ->get();
 
+        $unreadCount = $this->visibleQuery()
+            ->whereDoesntHave('readByUsers', function ($q) use ($user) {
+                $q->where('user_id', $user->id)
+                  ->where('is_read', true);
+            })
+            ->count();
+
+        $unreadBase = function () use ($user) {
+            return $this->visibleQuery()
+                ->whereDoesntHave('readByUsers', function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                      ->where('is_read', true);
+                });
+        };
+
+        $tabUnreadCounts = collect(['All', 'Company', 'HR', 'Policies', 'Training', 'Events'])
+            ->mapWithKeys(function ($cat) use ($unreadBase) {
+                $q = clone $unreadBase();
+                if ($cat !== 'All') {
+                    $q->where('category', $cat);
+                }
+                return [$cat => $q->count()];
+            })
+            ->all();
+
+        $readIds = Notification::whereHas('readByUsers', function ($q) use ($user) {
+            $q->where('user_id', $user->id)
+              ->where('is_read', true);
+        })->pluck('id')->all();
+
         return view(
             'NotificationManagement.notifications.index',
             compact(
                 'notifications',
                 'important',
-                'recent'
+                'recent',
+                'unreadCount',
+                'tabUnreadCounts',
+                'readIds'
             )
         );
     }
 
-   
+    //  JSON endpoint of per-category unread counts (used for real-time badge polling)
+    public function unreadCounts()
+    {
+        $user = auth()->user();
+
+        $unreadBase = function () use ($user) {
+            return $this->visibleQuery()
+                ->whereDoesntHave('readByUsers', function ($q) use ($user) {
+                    $q->where('user_id', $user->id)
+                      ->where('is_read', true);
+                });
+        };
+
+        $counts = collect(['All', 'Company', 'HR', 'Policies', 'Training', 'Events'])
+            ->mapWithKeys(function ($cat) use ($unreadBase) {
+                $q = clone $unreadBase();
+                if ($cat !== 'All') {
+                    $q->where('category', $cat);
+                }
+                return [$cat => $q->count()];
+            })
+            ->all();
+
+        return response()->json($counts);
+    }
+
     //  Create Form
-    
     public function create()
     {
+        $this->ensureCanManage();
+
         return view('NotificationManagement.notifications.create');
     }
 
-   
     //  Store Notification
-      
     public function store(Request $request)
     {
+        $this->ensureCanManage();
+
         $request->validate([
-
             'title' => 'required|max:255',
-
             'description' => 'required',
-
             'category' => 'required',
-
             'department' => 'nullable',
-
             'priority' => 'required',
-
             'published_by' => 'required',
-
             'publish_date' => 'required|date',
-
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048'
-
         ]);
 
         $notification = new Notification();
@@ -116,11 +180,9 @@ class NotificationController extends Controller
         $notification->status = true;
 
         if ($request->hasFile('attachment')) {
-
             $notification->attachment = $request
                 ->file('attachment')
                 ->store('notifications', 'public');
-
         }
 
         $notification->save();
@@ -133,15 +195,20 @@ class NotificationController extends Controller
     //  Edit Notification
     public function edit($id)
     {
+        $this->ensureCanManage();
+
         $notification = Notification::findOrFail($id);
+
         return view('NotificationManagement.notifications.edit', compact('notification'));
     }
 
     //  Show Notification
-     
     public function show($id)
     {
         $notification = Notification::findOrFail($id);
+
+        // Mark as read once the user opens and views it
+        $notification->markAsRead(auth()->user());
 
         return view(
             'NotificationManagement.notifications.show',
@@ -150,27 +217,19 @@ class NotificationController extends Controller
     }
 
     //  Update Notification
-    
     public function update(Request $request, $id)
     {
+        $this->ensureCanManage();
+
         $request->validate([
-
             'title' => 'required|max:255',
-
             'description' => 'required',
-
             'category' => 'required',
-
             'department' => 'nullable',
-
             'priority' => 'required',
-
             'published_by' => 'required',
-
             'publish_date' => 'required|date',
-
             'attachment' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048'
-
         ]);
 
         $notification = Notification::findOrFail($id);
@@ -185,17 +244,13 @@ class NotificationController extends Controller
         $notification->is_pinned = $request->has('is_pinned');
 
         if ($request->hasFile('attachment')) {
-
             if ($notification->attachment) {
-
                 Storage::disk('public')->delete($notification->attachment);
-
             }
 
             $notification->attachment = $request
                 ->file('attachment')
                 ->store('notifications', 'public');
-
         }
 
         $notification->save();
@@ -205,17 +260,15 @@ class NotificationController extends Controller
             ->with('success', 'Notification Updated Successfully.');
     }
 
-  
-    //   Delete Notification
-
+    //  Delete Notification
     public function destroy($id)
     {
+        $this->ensureCanManage();
+
         $notification = Notification::findOrFail($id);
 
         if ($notification->attachment) {
-
             Storage::disk('public')->delete($notification->attachment);
-
         }
 
         $notification->delete();
@@ -225,11 +278,11 @@ class NotificationController extends Controller
             ->with('success', 'Notification Deleted Successfully.');
     }
 
-
-    //   Pin Notification
-    
+    //  Pin Notification
     public function pin($id)
     {
+        $this->ensureCanManage();
+
         $notification = Notification::findOrFail($id);
 
         $notification->is_pinned = true;
@@ -239,11 +292,11 @@ class NotificationController extends Controller
         return back()->with('success', 'Notification Pinned Successfully.');
     }
 
-    
-    //   Unpin Notification
-    
+    //  Unpin Notification
     public function unpin($id)
     {
+        $this->ensureCanManage();
+
         $notification = Notification::findOrFail($id);
 
         $notification->is_pinned = false;
@@ -251,5 +304,21 @@ class NotificationController extends Controller
         $notification->save();
 
         return back()->with('success', 'Notification Unpinned Successfully.');
+    }
+
+    //  Mark all visible notifications as read for the current user
+    public function markAllAsRead()
+    {
+        $user = auth()->user();
+
+        $ids = $this->visibleQuery()->pluck('id');
+
+        $user->notificationsRead()->syncWithoutDetaching(
+            $ids->mapWithKeys(fn($id) => [$id => ['is_read' => true, 'read_at' => now()]])
+        );
+
+        return redirect()
+            ->route('notifications.index')
+            ->with('success', 'All notifications marked as read.');
     }
 }

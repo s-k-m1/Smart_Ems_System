@@ -1,0 +1,120 @@
+/* Global dark mode overrides — applied when <html> has class "dark" */
+
+.dark body {
+    background-color: #020617 !important;
+    color: #e2e8f0 !important;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Cards & surfaces */
+.dark .bg-white { background-color: #0f172a !important; }
+.dark .bg-slate-50 { background-color: #0b1120 !important; }
+.dark .bg-slate-100 { background-color: #1e293b !important; }
+.dark .bg-slate-200 { background-color: #334155 !important; }
+.dark .bg-gray-50 { background-color: #0b1120 !important; }
+.dark .bg-gray-100 { background-color: #1e293b !important; }
+.dark .bg-gray-200 { background-color: #334155 !important; }
+
+/* Dark accents (sidebar, header, primary buttons) shift to slate-700 to stay visible */
+.dark .bg-slate-900 { background-color: #334155 !important; }
+.dark .bg-slate-800 { background-color: #334155 !important; }
+.dark .bg-slate-700 { background-color: #475569 !important; }
+.dark .bg-slate-600 { background-color: #64748b !important; }
+.dark .hover\:bg-slate-800:hover { background-color: #475569 !important; }
+.dark .hover\:bg-slate-700:hover { background-color: #475569 !important; }
+.dark .hover\:bg-gray-50:hover { background-color: #1e293b !important; }
+
+/* Borders & dividers */
+.dark .border-slate-200,
+.dark .border-slate-300,
+.dark .border-gray-200,
+.dark .border-gray-300 { border-color: #1e293b !important; }
+.dark .divide-slate-200 > * + *,
+.dark .divide-gray-200 > * + * { border-color: #1e293b !important; }
+.dark .ring-slate-200,
+.dark .ring-slate-300 { --tw-ring-color: #1e293b !important; }
+
+/* Text */
+.dark .text-slate-900,
+.dark .text-gray-900 { color: #f1f5f9 !important; }
+.dark .text-slate-700,
+.dark .text-gray-700 { color: #cbd5e1 !important; }
+.dark .text-slate-600,
+.dark .text-gray-600 { color: #a5b4fc !important; }
+.dark .text-slate-500,
+.dark .text-gray-500 { color: #94a3b8 !important; }
+.dark .text-slate-400,
+.dark .text-gray-400 { color: #64748b !important; }
+.dark .text-slate-300,
+.dark .text-gray-300 { color: #cbd5e1 !important; }
+.dark .text-slate-200,
+.dark .text-gray-200 { color: #e2e8f0 !important; }
+
+/* Tinted backgrounds (status badges, labels, icons) */
+.dark .bg-indigo-50 { background-color: #1e1b4b !important; }
+.dark .bg-indigo-100 { background-color: #312e81 !important; }
+.dark .bg-emerald-50 { background-color: #022c22 !important; }
+.dark .bg-emerald-100 { background-color: #064e3b !important; }
+.dark .bg-red-50 { background-color: #450a0a !important; }
+.dark .bg-red-100 { background-color: #7f1d1d !important; }
+.dark .bg-amber-50 { background-color: #451a03 !important; }
+.dark .bg-amber-100 { background-color: #78350f !important; }
+.dark .bg-sky-50 { background-color: #082f49 !important; }
+.dark .bg-sky-100 { background-color: #0c4a6e !important; }
+.dark .bg-blue-50 { background-color: #172554 !important; }
+.dark .bg-blue-100 { background-color: #1e3a8a !important; }
+.dark .bg-purple-50 { background-color: #2e1065 !important; }
+.dark .bg-purple-100 { background-color: #4c1d95 !important; }
+.dark .bg-teal-50 { background-color: #042f2e !important; }
+.dark .bg-orange-50 { background-color: #431407 !important; }
+.dark .bg-pink-50 { background-color: #500724 !important; }
+.dark .bg-green-50 { background-color: #022c22 !important; }
+.dark .bg-yellow-50 { background-color: #451a03 !important; }
+
+/* Tinted text stays readable on the darker surfaces */
+.dark .text-indigo-600,
+.dark .text-indigo-700 { color: #a5b4fc !important; }
+.dark .text-emerald-600,
+.dark .text-emerald-700 { color: #6ee7b7 !important; }
+.dark .text-red-600,
+.dark .text-red-700 { color: #fca5a5 !important; }
+.dark .text-amber-600,
+.dark .text-amber-700 { color: #fcd34d !important; }
+.dark .text-sky-600,
+.dark .text-sky-700 { color: #7dd3fc !important; }
+.dark .text-blue-600,
+.dark .text-blue-700 { color: #93c5fd !important; }
+.dark .text-purple-600,
+.dark .text-purple-700 { color: #c4b5fd !important; }
+.dark .text-teal-600,
+.dark .text-teal-700 { color: #5eead4 !important; }
+.dark .text-orange-600,
+.dark .text-orange-700 { color: #fdba74 !important; }
+.dark .text-pink-600,
+.dark .text-pink-700 { color: #f9a8d4 !important; }
+.dark .text-green-600,
+.dark .text-green-700 { color: #86efac !important; }
+.dark .text-yellow-600,
+.dark .text-yellow-700 { color: #fde047 !important; }
+
+/* Form controls */
+.dark input[type="text"],
+.dark input[type="email"],
+.dark input[type="password"],
+.dark input[type="number"],
+.dark input[type="date"],
+.dark input[type="time"],
+.dark input[type="search"],
+.dark input[type="tel"],
+.dark textarea,
+.dark select {
+    background-color: #0b1120 !important;
+    color: #e2e8f0 !important;
+    border-color: #334155 !important;
+}
+.dark input::placeholder,
+.dark textarea::placeholder { color: #64748b !important; }
+
+/* Tables */
+.dark thead { background-color: #1e293b !important; }
+.dark tbody tr:hover { background-color: #1e293b !important; }

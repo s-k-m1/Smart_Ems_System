@@ -11,6 +11,35 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceDashboardController extends Controller
 {
+    // Allowed date range: Admin/HR can go back up to 7 days, employees only today
+    private function allowedDateRange(): array
+    {
+        if (auth()->user()->isEmployee()) {
+            return [
+                'min' => now()->format('Y-m-d'),
+                'max' => now()->format('Y-m-d'),
+            ];
+        }
+
+        return [
+            'min' => now()->subDays(7)->format('Y-m-d'),
+            'max' => now()->format('Y-m-d'),
+        ];
+    }
+
+    private function dateWithinAllowedRange($date): bool
+    {
+        $range = $this->allowedDateRange();
+        $value = \Carbon\Carbon::parse($date)->format('Y-m-d');
+
+        return $value >= $range['min'] && $value <= $range['max'];
+    }
+
+    private function denyEmployeeWrite(): void
+    {
+        abort_if(auth()->user()->isEmployee(), 403, 'Employees can only record today\'s attendance and cannot edit or delete records.');
+    }
+
     // DASHBOARD
     public function index(Request $request)
     {
@@ -166,8 +195,21 @@ class AttendanceDashboardController extends Controller
 // CREATE PAGE
     public function create()
     {
-        $employees = Employee::all();
-        return view('AttendanceLeave.attendance.create', compact('employees'));
+        $user = auth()->user();
+        $range = $this->allowedDateRange();
+        $minDate = $range['min'];
+        $maxDate = $range['max'];
+        $employee = null;
+
+        if ($user->isEmployee()) {
+            $employee = $user->employee;
+            abort_unless($employee, 403, 'No employee profile linked to your account.');
+            $employees = collect([$employee]);
+        } else {
+            $employees = Employee::all();
+        }
+
+        return view('AttendanceLeave.attendance.create', compact('employees', 'minDate', 'maxDate', 'employee'));
     }
 
     private function detectStatus($checkIn, $checkOut, $workingHours)
@@ -191,15 +233,26 @@ class AttendanceDashboardController extends Controller
     // STORE
     public function store(Request $request)
 {
+    $user = auth()->user();
+    $range = $this->allowedDateRange();
+
     $request->validate([
         'employee_id' => 'required|exists:employees,id',
-        'date' => 'required|date|after_or_equal:today|before_or_equal:today',
+        'date' => 'required|date|after_or_equal:' . $range['min'] . '|before_or_equal:' . $range['max'],
         'check_in' => 'nullable',
         'check_out' => 'nullable',
     ]);
 
+    // Employees can only record attendance for themselves
+    $employeeId = $request->employee_id;
+    if ($user->isEmployee()) {
+        $employee = $user->employee;
+        abort_unless($employee, 403, 'No employee profile linked to your account.');
+        $employeeId = $employee->id;
+    }
+
     // prevent duplicate attendance for same employee on same date
-    $exists = Attendance::where('employee_id', $request->employee_id)
+    $exists = Attendance::where('employee_id', $employeeId)
         ->where('date', $request->date)
         ->exists();
 
@@ -217,7 +270,7 @@ class AttendanceDashboardController extends Controller
     $status = $this->detectStatus($request->check_in, $request->check_out, $workingHours);
 
     Attendance::create([
-        'employee_id' => $request->employee_id,
+        'employee_id' => $employeeId,
         'status' => $status,
         'date' => $request->date,
         'check_in' => $request->check_in,
@@ -225,13 +278,22 @@ class AttendanceDashboardController extends Controller
         'working_hours' => $workingHours,
     ]);
 
-    return redirect('/attendance?employee=' . $request->employee_id)->with('success', "Attendance recorded as {$status}.");
+    return redirect('/attendance?employee=' . $employeeId)->with('success', "Attendance recorded as {$status}.");
 }
 
     // EDIT PAGE
     public function edit($id)
     {
+        $this->denyEmployeeWrite();
+
         $attendance = Attendance::findOrFail($id);
+
+        abort_unless(
+            $this->dateWithinAllowedRange($attendance->date),
+            403,
+            'Attendance records can only be edited within the last 7 days.'
+        );
+
         $employees = Employee::all();
 
         return view('AttendanceLeave.attendance.edit', compact('attendance', 'employees'));
@@ -240,7 +302,15 @@ class AttendanceDashboardController extends Controller
     // UPDATE
     public function update(Request $request, $id)
 {
+    $this->denyEmployeeWrite();
+
     $attendance = Attendance::findOrFail($id);
+
+    abort_unless(
+        $this->dateWithinAllowedRange($attendance->date),
+        403,
+        'Attendance records can only be edited within the last 7 days.'
+    );
 
     $request->validate([
         'employee_id' => 'required|exists:employees,id',
@@ -283,7 +353,7 @@ class AttendanceDashboardController extends Controller
     // REPORT
     public function report()
     {
-        $attendances = Attendance::with('employee')->get();
+        $attendances = Attendance::with('employee')->orderBy('date', 'desc')->paginate(10);
 
         return view('AttendanceLeave.attendance.report', compact('attendances'));
     }

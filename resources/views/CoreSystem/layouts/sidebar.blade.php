@@ -42,9 +42,15 @@
 
         @if(Auth::user()->hasAnyPermission(['manage_notifications', 'view_notifications']))
         <a href="/notifications"
-           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->is('notifications*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
+           class="relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->is('notifications*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
             <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-            Notifications
+            <span class="flex-1">Notifications</span>
+            @php $navUnread = auth()->user()->unreadNotificationsCount(); @endphp
+            @if($navUnread > 0)
+                <span class="shrink-0 bg-red-500 text-white text-[10px] font-bold min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center">
+                    {{ $navUnread > 99 ? '99+' : $navUnread }}
+                </span>
+            @endif
         </a>
         @endif
 
@@ -66,6 +72,15 @@
             Reports
         </a>
         @endif
+
+        <div class="pt-4 pb-2">
+            <p class="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">General</p>
+        </div>
+        <a href="/settings"
+           class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->is('settings*') ? 'bg-slate-700 text-white' : 'text-slate-300 hover:bg-slate-800 hover:text-white' }} transition">
+            <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            Settings
+        </a>
     </nav>
 
     <div class="px-4 py-4 border-t border-slate-700">
@@ -77,6 +92,12 @@
                 <p class="text-sm font-medium truncate">{{ Auth::user()->name }}</p>
                 <p class="text-xs text-slate-400 capitalize truncate">{{ Auth::user()->role }}</p>
             </div>
+            <button type="button" id="sidebarThemeBtn"
+                    class="text-slate-400 hover:text-white transition shrink-0 p-1 rounded-lg hover:bg-slate-800"
+                    title="Toggle dark/light mode">
+                <svg id="sidebarIconSun" class="w-5 h-5 {{ auth()->user()->theme === 'dark' ? 'hidden' : '' }}" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                <svg id="sidebarIconMoon" class="w-5 h-5 {{ auth()->user()->theme === 'dark' ? '' : 'hidden' }}" fill="currentColor" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+            </button>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="text-slate-400 hover:text-white transition shrink-0" title="Logout">
@@ -101,6 +122,25 @@
                     setTimeout(function() { overlay.classList.add('hidden'); }, 200);
                     document.body.classList.remove('overflow-hidden');
                 }
+            });
+        }
+
+        var sidebarThemeBtn = document.getElementById('sidebarThemeBtn');
+        if (sidebarThemeBtn) {
+            sidebarThemeBtn.addEventListener('click', function() {
+                var isDark = document.documentElement.classList.contains('dark');
+                var next = isDark ? 'light' : 'dark';
+                document.documentElement.classList.toggle('dark', next === 'dark');
+                document.getElementById('sidebarIconSun').classList.toggle('hidden', next === 'dark');
+                document.getElementById('sidebarIconMoon').classList.toggle('hidden', next !== 'dark');
+                fetch('{{ route('settings.theme') }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ theme: next })
+                });
             });
         }
     });

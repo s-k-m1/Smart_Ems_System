@@ -18,18 +18,12 @@ $currentCategory = request('category', 'All');
         @foreach($categories as $key => $label)
 
             @php
-
-                if($key == 'All'){
-                    $count = \App\Models\Notification::count();
-                }else{
-                    $count = \App\Models\Notification::where('category',$key)->count();
-                }
-
+                $unread = $tabUnreadCounts[$key] ?? 0;
                 $active = $currentCategory == $key;
-
             @endphp
 
             <a href="{{ route('notifications.index',['category'=>$key]) }}"
+                data-unread-badge="{{ $key }}"
 
                 class="group flex items-center gap-2 px-5 py-3 rounded-xl transition-all duration-200
 
@@ -149,16 +143,19 @@ $currentCategory = request('category', 'All');
 
                 </span>
 
-                <span class="text-xs px-2 py-1 rounded-full
+                {{-- Unread (new) badge --}}
+                <span class="unread-count text-xs font-bold min-w-6 h-6 px-1.5 rounded-full inline-flex items-center justify-center bg-red-500 text-white transition {{ $unread > 0 ? '' : 'hidden' }}">
 
-                    {{ $active
-                        ? 'bg-white/20 text-white'
-                        : 'bg-blue-100 text-blue-700'
-                    }}">
-
-                    {{ $count }}
+                    {{ $unread }}
 
                 </span>
+
+                @if($unread > 0)
+                    <span class="relative flex w-2 h-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full w-2 h-2 bg-red-500"></span>
+                    </span>
+                @endif
 
             </a>
 

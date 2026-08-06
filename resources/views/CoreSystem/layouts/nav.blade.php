@@ -14,7 +14,23 @@
                         <a href="/leave" class="text-slate-600 hover:text-slate-800 transition">Leave</a>
                     @endif
                     @if(Auth::user()->hasAnyPermission(['manage_notifications', 'view_notifications']))
-                        <a href="/notifications" class="text-slate-600 hover:text-slate-800 transition">Notifications</a>
+                        <a href="/notifications" class="relative text-slate-600 hover:text-slate-800 transition flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="w-5 h-5"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 17h5l-1.4-1.4A2 2 0 0118 14.17V11a6 6 0 10-12 0v3.17c0 .53-.21 1.04-.59 1.42L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                            <span class="hidden lg:inline">Notifications</span>
+                            @php $navUnread = auth()->user()->unreadNotificationsCount(); @endphp
+                            @if($navUnread > 0)
+                                <span class="absolute -top-1.5 -left-2 lg:static lg:ml-1 bg-red-500 text-white text-[10px] font-bold min-w-4 h-4 px-1 rounded-full flex items-center justify-center">
+                                    {{ $navUnread > 99 ? '99+' : $navUnread }}
+                                </span>
+                            @endif
+                        </a>
                     @endif
                     @if(Auth::user()->hasAnyPermission(['manage_payroll', 'view_payroll']))
                         <a href="/payroll" class="text-slate-600 hover:text-slate-800 transition">Payroll</a>

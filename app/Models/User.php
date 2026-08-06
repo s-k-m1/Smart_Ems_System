@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role'])]
+#[Fillable(['name', 'email', 'password', 'role', 'theme'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -80,6 +80,35 @@ class User extends Authenticatable
     public function employee()
     {
         return $this->hasOne(Employee::class, 'user_id');
+    }
+
+    public function notificationsRead()
+    {
+        return $this->belongsToMany(Notification::class, 'notification_user')
+            ->withPivot('is_read', 'read_at')
+            ->withTimestamps();
+    }
+
+    public function unreadNotificationsCount(): int
+    {
+        $query = Notification::query()
+            ->whereDoesntHave('readByUsers', function ($q) {
+                $q->where('user_id', $this->id)
+                  ->where('is_read', true);
+            });
+
+        if ($this->isEmployee()) {
+            $employee = $this->employee;
+            $query->where(function ($q) use ($employee) {
+                $q->whereNull('department')
+                  ->orWhere('department', '');
+                if ($employee) {
+                    $q->orWhere('department', $employee->department);
+                }
+            });
+        }
+
+        return $query->count();
     }
 
     protected function casts(): array

@@ -54,6 +54,14 @@ Route::middleware(['web', 'auth', 'permission:view_attendance'])->group(function
         ->name('notifications.store')
         ->middleware('permission:manage_notifications');
 
+    Route::post('/notifications/mark-all-read', [NotificationController::class, 'markAllAsRead'])
+        ->name('notifications.mark-all-read')
+        ->middleware('permission:view_notifications');
+
+    Route::get('/notifications/unread-counts', [NotificationController::class, 'unreadCounts'])
+        ->name('notifications.unread-counts')
+        ->middleware('permission:view_notifications');
+
     Route::get('/notifications/{id}', [NotificationController::class, 'show'])
         ->name('notifications.show')->middleware('permission:view_notifications');
 

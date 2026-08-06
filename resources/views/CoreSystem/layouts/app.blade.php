@@ -1,14 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="{{ auth()->user()->theme ?? 'light' }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>@yield('title', 'Smart EMS')</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        };
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
     @stack('styles')
 </head>
-<body class="bg-slate-50 min-h-screen">
+<body class="bg-slate-50 min-h-screen dark:bg-slate-950 dark:text-slate-100">
 
     {{-- Mobile header bar --}}
     <div class="fixed top-0 left-0 right-0 z-40 lg:hidden bg-slate-900 text-white flex items-center justify-between px-4 py-3">

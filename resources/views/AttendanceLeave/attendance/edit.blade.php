@@ -3,350 +3,120 @@
 @section('title', 'Edit Attendance')
 
 @section('content')
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6">
 
-    <div class="px-4 sm:px-8 py-4 sm:py-8"
-    >
+        {{-- Page header --}}
+        <div class="flex items-center justify-between mb-5">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                    <svg class="w-5 h-5 text-slate-500 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-lg font-semibold text-slate-900 dark:text-white leading-tight">Edit Attendance</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Modify attendance information</p>
+                </div>
+            </div>
+            <a href="/attendance/report" class="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition font-medium">
+                &larr; Back
+            </a>
+        </div>
 
-        <div
-            class="
-                bg-white
-                rounded-[40px]
-                overflow-hidden
-                shadow-2xl
-            "
-        >
+        @if ($errors->any())
+            <div class="mb-4 rounded-lg bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 px-4 py-3">
+                <ul class="list-disc list-inside text-xs text-red-600 dark:text-red-300 space-y-1">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-            {{-- Header --}}
-            <div
-                class="
-                    bg-gradient-to-r
-                    from-indigo-600
-                    to-blue-500
-                    p-10
-                    text-white
-                "
-            >
+        <form action="/attendance/{{ $attendance->id }}/update" method="POST"
+              class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
 
-                <div class="flex justify-between items-center">
+            @csrf
 
-                    <div>
+            <div class="px-6 py-5 border-b border-slate-100 dark:border-slate-800">
+                <h2 class="text-sm font-semibold text-slate-700 dark:text-slate-200">Attendance Details</h2>
+            </div>
 
-                        <h1
-                            class="
-                                text-5xl
-                                font-bold
-                            "
-                        >
-                            Edit Attendance
-                        </h1>
+            <div class="px-6 py-6 grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
 
-                        <p
-                            class="
-                                mt-3
-                                text-blue-100
-                                text-lg
-                            "
-                        >
-                            Modify attendance information
-                        </p>
+                {{-- Employee --}}
+                <div>
+                    <label class="block mb-1.5 text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                        Employee
+                    </label>
+                    <select name="employee_id" required
+                            class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:border-indigo-400 transition">
+                        @foreach($employees as $employee)
+                            <option value="{{ $employee->id }}" {{ $attendance->employee_id == $employee->id ? 'selected' : '' }}>
+                                {{ $employee->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
 
+                {{-- Current status --}}
+                <div>
+                    <label class="block mb-1.5 text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                        Current Status
+                    </label>
+                    <div class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3.5 py-2.5 text-sm text-slate-600 dark:text-slate-300">
+                        <span class="font-medium text-slate-700 dark:text-slate-200">{{ $attendance->status }}</span>
+                        <span class="text-slate-400 dark:text-slate-500">&middot; recalculated on save</span>
                     </div>
+                </div>
 
-                    <div
-                        class="
-                            w-24
-                            h-24
-                            rounded-full
-                            bg-white/20
-                            flex
-                            items-center
-                            justify-center
-                            text-5xl
-                        "
-                    >
-                        ✏️
-                    </div>
+                {{-- Date --}}
+                <div>
+                    <label class="block mb-1.5 text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                        Attendance Date
+                    </label>
+                    <input type="date" name="date" value="{{ $attendance->date }}" required
+                           min="{{ $attendance->date }}"
+                           max="{{ $attendance->date }}"
+                           class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:border-indigo-400 transition" />
+                </div>
 
+                {{-- Check In --}}
+                <div>
+                    <label class="block mb-1.5 text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                        Check In
+                    </label>
+                    <input type="time" name="check_in" value="{{ $attendance->check_in }}"
+                           class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:border-indigo-400 transition" />
+                </div>
+
+                {{-- Check Out --}}
+                <div>
+                    <label class="block mb-1.5 text-[13px] font-medium text-slate-500 dark:text-slate-400">
+                        Check Out
+                    </label>
+                    <input type="time" name="check_out" value="{{ $attendance->check_out }}"
+                           class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 dark:text-slate-200 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:border-indigo-400 transition" />
                 </div>
 
             </div>
 
-            <form
-                action="/attendance/{{ $attendance->id }}/update"
-                method="POST"
-                class="p-10"
-            >
-
-                @csrf
-
-                <div
-                    class="
-                        grid
-                        grid-cols-2
-                        gap-8
-                    "
-                >
-
-                    {{-- Employee --}}
-                    <div>
-
-                        <label
-                            class="
-                                text-gray-500
-                                block
-                                mb-3
-                                font-semibold
-                            "
-                        >
-                            Employee
-                        </label>
-
-                        <select
-                            name="employee_id"
-                            required
-                            class="
-                                w-full
-                                rounded-[24px]
-                                border
-                                border-gray-200
-                                bg-slate-50
-                                px-6
-                                py-5
-                                focus:ring-4
-                                focus:ring-indigo-100
-                                outline-none
-                            "
-                        >
-
-                            @foreach($employees as $employee)
-
-                                <option
-                                    value="{{ $employee->id }}"
-                                    {{ $attendance->employee_id == $employee->id ? 'selected' : '' }}
-                                >
-                                    {{ $employee->name }}
-                                </option>
-
-                            @endforeach
-
-                        </select>
-
-                    </div>
-
-                    {{-- Auto Status Info --}}
-                    <div>
-
-                        <div class="bg-indigo-50 rounded-[24px] px-6 py-5 border border-indigo-100">
-                            <p class="text-sm text-indigo-700 font-medium">Status Auto-Detected</p>
-                            <p class="text-xs text-indigo-500 mt-1">Current: <strong>{{ $attendance->status }}</strong>. Will be recalculated from check-in/check-out on save.</p>
-                        </div>
-
-                    </div>
-
-                    {{-- Date --}}
-                    <div>
-
-                        <label
-                            class="
-                                text-gray-500
-                                block
-                                mb-3
-                                font-semibold
-                            "
-                        >
-                            Attendance Date
-                        </label>
-
-                        <input
-                            type="date"
-                            name="date"
-                            value="{{ $attendance->date }}"
-                            required
-                            min="{{ $attendance->date }}"
-                            max="{{ $attendance->date }}"
-                            class="
-                                w-full
-                                rounded-[24px]
-                                border
-                                border-gray-200
-                                bg-slate-50
-                                px-6
-                                py-5
-                            "
-                        />
-
-                    </div>
-
-                    {{-- Check In --}}
-                    <div>
-
-                        <label
-                            class="
-                                text-gray-500
-                                block
-                                mb-3
-                                font-semibold
-                            "
-                        >
-                            Check In
-                        </label>
-
-                        <input
-                            type="time"
-                            name="check_in"
-                            value="{{ $attendance->check_in }}"
-                            class="
-                                w-full
-                                rounded-[24px]
-                                border
-                                border-gray-200
-                                bg-slate-50
-                                px-6
-                                py-5
-                            "
-                        />
-
-                    </div>
-
-                    {{-- Check Out --}}
-                    <div class="col-span-2">
-
-                        <label
-                            class="
-                                text-gray-500
-                                block
-                                mb-3
-                                font-semibold
-                            "
-                        >
-                            Check Out
-                        </label>
-
-                        <input
-                            type="time"
-                            name="check_out"
-                            value="{{ $attendance->check_out }}"
-                            class="
-                                w-full
-                                rounded-[24px]
-                                border
-                                border-gray-200
-                                bg-slate-50
-                                px-6
-                                py-5
-                            "
-                        />
-
-                    </div>
-
+            <div class="px-6 py-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-3">
+                <p class="text-xs text-slate-400 dark:text-slate-500 hidden sm:block">
+                    Changes will immediately update the attendance record.
+                </p>
+                <div class="flex items-center gap-2 ml-auto">
+                    <a href="/attendance/report"
+                       class="px-4 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition">
+                        Cancel
+                    </a>
+                    <button type="submit"
+                            class="px-5 py-2 rounded-lg bg-slate-900 dark:bg-indigo-600 text-white text-sm font-medium hover:bg-slate-700 dark:hover:bg-indigo-500 shadow-sm transition">
+                        Update Attendance
+                    </button>
                 </div>
+            </div>
 
-              {{-- Bottom Area --}}
-                <div
-                    class="
-                        mt-8
-                        bg-slate-50
-                        rounded-2xl
-                        p-5
-                        sm:p-6
-                        lg:p-8
-                        flex
-                        flex-col
-                        lg:flex-row
-                        justify-between
-                        items-start
-                        lg:items-center
-                        gap-6
-                    "
-                >
-
-                    <div class="w-full lg:w-auto">
-
-                        <h3
-                            class="
-                                text-lg
-                                sm:text-xl
-                                font-semibold
-                                text-slate-700
-                            "
-                        >
-                            Update Employee Attendance
-                        </h3>
-
-                        <p
-                            class="
-                                text-gray-400
-                                mt-2
-                                text-sm
-                                sm:text-base
-                            "
-                        >
-                            Changes will immediately update attendance records.
-                        </p>
-
-                    </div>
-
-                    <div
-                        class="
-                            flex
-                            flex-col
-                            sm:flex-row
-                            gap-3
-                            w-full
-                            lg:w-auto
-                        "
-                    >
-
-                        <a
-                            href="/attendance/report"
-                            class="
-                                w-full
-                                sm:w-auto
-                                text-center
-                                px-6
-                                py-3
-                                rounded-xl
-                                bg-white
-                                shadow
-                                hover:shadow-lg
-                                transition
-                            "
-                        >
-                            Cancel
-                        </a>
-
-                        <button
-                            type="submit"
-                            class="
-                                w-full
-                                sm:w-auto
-                                whitespace-nowrap
-                                px-6
-                                py-3
-                                rounded-xl
-                                bg-gradient-to-r
-                                from-indigo-600
-                                to-blue-500
-                                text-white
-                                font-semibold
-                                shadow-lg
-                                hover:scale-105
-                                transition
-                            "
-                        >
-                            Update Attendance
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </form>
-
-        </div>
-
+        </form>
     </div>
-
 @endsection
 
 @push('scripts')

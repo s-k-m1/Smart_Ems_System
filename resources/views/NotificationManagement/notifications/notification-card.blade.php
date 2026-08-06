@@ -1,5 +1,9 @@
-<div
-    class="w-full bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 mb-6 overflow-hidden">
+@php
+    $canManage = auth()->user()->hasPermission('manage_notifications');
+    $isRead = in_array($notification->id, $readIds ?? []);
+@endphp
+
+<div class="w-full bg-white rounded-2xl border {{ $isRead ? 'border-slate-200' : 'border-blue-200 ring-1 ring-blue-100' }} shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 mb-6 overflow-hidden">
 
     <!-- Top Border -->
     <div class="
@@ -22,7 +26,7 @@
             <div class="flex flex-col sm:flex-row items-start gap-4 flex-1 min-w-0">
 
                 <!-- Icon -->
-                <div class="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                <div class="relative w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
 
                     <svg xmlns="http://www.w3.org/2000/svg"
                         class="w-7 h-7 text-blue-600"
@@ -37,16 +41,28 @@
 
                     </svg>
 
+                    @if(!$isRead)
+                        <span class="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-red-500 ring-2 ring-white"></span>
+                    @endif
+
                 </div>
 
                 <!-- Title -->
                 <div class="flex-1 min-w-0">
 
-                    <h2 class="text-lg sm:text-xl font-semibold text-slate-800 break-words">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <h2 class="text-lg sm:text-xl font-semibold {{ $isRead ? 'text-slate-700' : 'text-slate-900' }} break-words">
 
-                        {{ $notification->title }}
+                            {{ $notification->title }}
 
-                    </h2>
+                        </h2>
+
+                        @if(!$isRead)
+                            <span class="px-2.5 py-0.5 rounded-full bg-red-50 text-red-600 text-[11px] font-semibold uppercase tracking-wide">
+                                New
+                            </span>
+                        @endif
+                    </div>
 
                     <!-- Category -->
                     <div class="flex flex-wrap gap-2 mt-3">
@@ -211,7 +227,16 @@
                 <a href="{{ route('notifications.show',$notification->id) }}"
                     class="w-full sm:w-auto text-center px-4 py-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 text-sm font-medium transition">
 
-                    View
+                    {!! $isRead ? 'View' : '<span class="inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>View</span>' !!}
+
+                </a>
+
+                @if($canManage)
+
+                <a href="{{ route('notifications.edit', $notification->id) }}"
+                    class="w-full sm:w-auto text-center px-4 py-2 rounded-lg bg-amber-50 text-amber-600 hover:bg-amber-100 text-sm font-medium transition">
+
+                    Edit
 
                 </a>
 
@@ -232,6 +257,8 @@
                     </button>
 
                 </form>
+
+                @endif
 
             </div>
 

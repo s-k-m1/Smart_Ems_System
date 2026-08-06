@@ -115,8 +115,14 @@
                 <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center group-hover:bg-purple-100 transition shrink-0">
                     <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
                 </div>
-                <div class="min-w-0">
-                    <h3 class="text-base sm:text-lg font-semibold text-slate-800">Notifications</h3>
+                <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-base sm:text-lg font-semibold text-slate-800">Notifications</h3>
+                        @php $dashUnread = auth()->user()->unreadNotificationsCount(); @endphp
+                        @if($dashUnread > 0)
+                            <span class="bg-red-500 text-white text-[10px] font-bold min-w-5 h-5 px-1.5 rounded-full flex items-center justify-center">{{ $dashUnread > 99 ? '99+' : $dashUnread }}</span>
+                        @endif
+                    </div>
                     <p class="text-slate-500 text-sm mt-0.5">Create and manage company notifications</p>
                 </div>
             </div>

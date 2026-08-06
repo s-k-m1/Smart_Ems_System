@@ -71,9 +71,8 @@
                 <!-- Bell + User -->
                 <div class="flex items-center justify-between sm:justify-start gap-4">
 
-                    <!-- Notification Bell -->
-                    <button
-                        class="relative shrink-0 w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-blue-50 transition">
+                        <a href="{{ route('notifications.index') }}"
+                            class="relative shrink-0 w-12 h-12 rounded-xl border border-gray-200 flex items-center justify-center hover:bg-blue-50 transition">
 
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="w-6 h-6 text-gray-600"
@@ -88,14 +87,18 @@
 
                         </svg>
 
-                        <span
-                            class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                        @if(($unreadCount ?? 0) > 0)
+                            <span id="bellUnread"
+                                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold min-w-5 h-5 px-1 rounded-full flex items-center justify-center">
 
-                            {{ $recent->count() }}
+                                {{ $unreadCount > 99 ? '99+' : $unreadCount }}
 
-                        </span>
+                            </span>
+                        @else
+                            <span id="bellUnread" class="hidden"></span>
+                        @endif
 
-                    </button>
+                    </a>
 
                     <!-- User -->
                     <div class="flex items-center gap-3 bg-gray-50 rounded-xl border px-3 py-2">

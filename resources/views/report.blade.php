@@ -24,12 +24,15 @@
            class="tab-btn px-4 py-2 rounded {{ request('tab', 'attendance') === 'distribution' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
             Distribution
         </a>
+        <a href="{{ route('report.index', ['tab' => 'leave']) }}"
+           class="tab-btn px-4 py-2 rounded {{ request('tab', 'attendance') === 'leave' ? 'bg-blue-600 text-white' : 'bg-gray-200' }}">
+            Leave
+        </a>
     </div>
 
     @if(request('tab', 'attendance') === 'attendance')
     <section>
 
-        @if($attendancePaginated)
         <div class="bg-white p-4 rounded mb-4">
             <p class="text-gray-500 text-sm">Showing {{ $attendancePaginated->firstItem() }}–{{ $attendancePaginated->lastItem() }} of {{ $attendancePaginated->total() }} results</p>
         </div>
@@ -72,14 +75,8 @@
                     @endforeach
                 </tbody>
             </table>
-            {{ $attendancePaginated->links() }}
+            {{ $attendancePaginated->appends(request()->query())->links() }}
         </div>
-
-        @else
-        <div class="bg-white p-6 rounded text-center text-gray-500">
-            <p>Select filters above and click Search to view attendance reports.</p>
-        </div>
-        @endif
 
         <div class="bg-white p-4 rounded">
             <form method="GET" action="{{ route('report.index') }}" class="flex flex-wrap gap-4">
@@ -126,7 +123,6 @@
     @if(request('tab', 'attendance') === 'distribution')
     <section>
 
-        @if($distributionPaginated)
         <div class="bg-white p-4 rounded mb-4">
             <p class="text-gray-500 text-sm">Showing {{ $distributionPaginated->firstItem() }}–{{ $distributionPaginated->lastItem() }} of {{ $distributionPaginated->total() }} results</p>
         </div>
@@ -150,14 +146,8 @@
                     @endforeach
                 </tbody>
             </table>
-            {{ $distributionPaginated->links() }}
+            {{ $distributionPaginated->appends(request()->query())->links() }}
         </div>
-
-        @else
-        <div class="bg-white p-6 rounded text-center text-gray-500">
-            <p>Select filters above and click Search to view distribution reports.</p>
-        </div>
-        @endif
 
         <div class="bg-white p-4 rounded">
             <form method="GET" action="{{ route('report.index') }}" class="flex flex-wrap gap-4">
@@ -178,6 +168,115 @@
                 <div class="flex gap-2 self-end">
                     <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Search</button>
                     <a href="{{ route('report.index', ['tab' => 'distribution']) }}" class="bg-gray-200 px-4 py-2 rounded">Reset</a>
+                </div>
+            </form>
+        </div>
+    </section>
+    @endif
+
+    @if(request('tab', 'attendance') === 'leave')
+    <section>
+
+        <div class="bg-white p-4 rounded mb-4">
+            <p class="text-gray-500 text-sm">Showing {{ $leavePaginated->firstItem() }}–{{ $leavePaginated->lastItem() }} of {{ $leavePaginated->total() }} results</p>
+        </div>
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div class="bg-white p-4 rounded">
+                <p class="text-gray-500 text-sm">Total</p>
+                <p class="text-xl font-bold">{{ $leavePaginated->total() }}</p>
+            </div>
+            <div class="bg-white p-4 rounded">
+                <p class="text-gray-500 text-sm">Approved</p>
+                <p class="text-xl font-bold text-green-600">{{ $leaveData->where('status', 'Approved')->count() }}</p>
+            </div>
+            <div class="bg-white p-4 rounded">
+                <p class="text-gray-500 text-sm">Pending</p>
+                <p class="text-xl font-bold text-yellow-600">{{ $leaveData->where('status', 'Pending')->count() }}</p>
+            </div>
+            <div class="bg-white p-4 rounded">
+                <p class="text-gray-500 text-sm">Rejected</p>
+                <p class="text-xl font-bold text-red-600">{{ $leaveData->where('status', 'Rejected')->count() }}</p>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded mb-4">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50 text-left">
+                        <th class="p-3">Name</th>
+                        <th class="p-3">Type</th>
+                        <th class="p-3">From</th>
+                        <th class="p-3">To</th>
+                        <th class="p-3">Days</th>
+                        <th class="p-3">Reason</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Approver</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($leaveData as $row)
+                    <tr>
+                        <td class="p-3 border-t">{{ $row['name'] }}</td>
+                        <td class="p-3 border-t">{{ $row['type'] }}</td>
+                        <td class="p-3 border-t">{{ $row['from_date'] }}</td>
+                        <td class="p-3 border-t">{{ $row['to_date'] }}</td>
+                        <td class="p-3 border-t">{{ $row['days'] }}</td>
+                        <td class="p-3 border-t">{{ $row['reason'] }}</td>
+                        <td class="p-3 border-t">{{ $row['status'] }}</td>
+                        <td class="p-3 border-t">{{ $row['approver'] ?? '—' }}</td>
+                    </tr>
+                    @endforeach
+                </tbody>
+            </table>
+            {{ $leavePaginated->appends(request()->query())->links() }}
+        </div>
+
+        <div class="bg-white p-4 rounded">
+            <form method="GET" action="{{ route('report.index') }}" class="flex flex-wrap gap-4">
+                <input type="hidden" name="tab" value="leave">
+                <div>
+                    <label class="block text-sm text-gray-500">From</label>
+                    <input type="date" name="leave_from" value="{{ request('leave_from') }}" class="border p-2 rounded">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500">To</label>
+                    <input type="date" name="leave_to" value="{{ request('leave_to') }}" class="border p-2 rounded">
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500">Employee</label>
+                    <select name="leave_employee" class="border p-2 rounded">
+                        <option value="">All Employees</option>
+                        @foreach ($attendanceEmployees as $employee)
+                            <option value="{{ $employee }}" {{ request('leave_employee') === $employee ? 'selected' : '' }}>{{ $employee }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500">Type</label>
+                    <select name="leave_type" class="border p-2 rounded">
+                        <option value="">All Types</option>
+                        @foreach ($leaveTypes as $type)
+                            <option value="{{ $type }}" {{ request('leave_type') === $type ? 'selected' : '' }}>{{ $type }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500">Status</label>
+                    <select name="leave_status" class="border p-2 rounded">
+                        <option value="">All</option>
+                        <option value="Approved" {{ request('leave_status') === 'Approved' ? 'selected' : '' }}>Approved</option>
+                        <option value="Pending" {{ request('leave_status') === 'Pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="Rejected" {{ request('leave_status') === 'Rejected' ? 'selected' : '' }}>Rejected</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm text-gray-500">Search</label>
+                    <input type="text" name="leave_search" value="{{ request('leave_search') }}" placeholder="Search by name..." class="border p-2 rounded">
+                </div>
+                <div class="flex gap-2 self-end">
+                    <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Search</button>
+                    <a href="{{ route('report.index', ['tab' => 'leave']) }}" class="bg-gray-200 px-4 py-2 rounded">Reset</a>
                 </div>
             </form>
         </div>
