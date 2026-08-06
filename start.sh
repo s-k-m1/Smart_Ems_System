@@ -19,8 +19,13 @@ fi
 echo "=== Running migrations ==="
 php artisan migrate --force || echo "Migrations failed — continuing"
 
-echo "=== Seeding admin user ==="
-php artisan db:seed --class=AdminSeeder --force || echo "Admin seeder skipped"
+echo "=== Seeding database if empty ==="
+SEEDED=$(php artisan tinker --execute="echo App\Models\User::exists() ? 'yes' : 'no';" 2>/dev/null)
+if [ "$SEEDED" = "yes" ]; then
+  echo "Users already exist — skipping seeder"
+else
+  php artisan db:seed --force || echo "Seeder failed — continuing"
+fi
 
 # Queue worker disabled — can cause SQLite lock contention
 # php artisan queue:work --tries=3 --timeout=90 --sleep=3 -q &
